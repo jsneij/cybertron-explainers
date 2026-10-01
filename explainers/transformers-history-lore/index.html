@@ -589,7 +589,7 @@ const DATA = {
     { id: "unicron", name: "Unicron", factions: ["neither"], eras: ["g1", "ut", "film", "aligned", "idw"], roles: ["antagonist"],
       profileSource: [{ ref: "wp-unicron", loc: "Fictional character biography" }, { ref: "wp-anim", loc: "Unicron Trilogy" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }, { ref: "wp-idw", loc: "lead" }],
       firstAppearance: { value: "1986", source: { ref: "wp-unicron", loc: "lead" } },
-      description: { claims: [{ text: "An evil god-like being who can transform into a giant mechanical planet.", source: { ref: "wp-unicron", loc: "lead" } }, "unicron-aligned"] },
+      description: { claims: [{ text: "An evil god-like being who can transform into a giant mechanical planet.", source: { ref: "wp-unicron", loc: "lead" } }, { label: "Transformers: Prime", claim: "unicron-aligned" }] },
       cmpId: "unicron" },
     { id: "optimus-primal", name: "Optimus Primal", factions: ["maximal"], eras: ["bw"], roles: ["leader"],
       profileSource: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" },
@@ -603,7 +603,7 @@ const DATA = {
     { id: "primus", name: "Primus", factions: ["neither"], eras: ["g1", "aligned"], roles: ["creator"],
       profileSource: [{ ref: "wp-franchise", loc: "Marvel comics (1984-1995)" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }],
       firstAppearance: null,
-      description: { claims: ["primus-uk-creator", "prime-primus-core"] },
+      description: { claims: [{ label: "UK Marvel comic", claim: "primus-uk-creator" }, { label: "Transformers: Prime", claim: "prime-primus-core" }] },
       cmpId: "origins" },
     { id: "quintessons", name: "The Quintessons", factions: ["neither"], eras: ["g1"], roles: ["creator", "antagonist"],
       profileSource: { ref: "wp-g1", loc: "Premise" },
@@ -785,7 +785,11 @@ function mergeSources(...lists) {
 
 /* ---- Claims: a record's prose is its own `key` text, or the DATA.claims it points at ---- */
 function claimPart(item) {
-  if (typeof item !== "string") return item;
+  if (typeof item !== "string") {
+    if (!item.claim) return item;
+    const c = claimPart(item.claim);   /* { label, claim }: the label frames a continuity-specific claim */
+    return { text: item.label + ": " + c.text, source: c.source };
+  }
   const c = DATA.claims[item];
   if (!c) throw new Error("Unknown claim id: " + item);
   return c;
