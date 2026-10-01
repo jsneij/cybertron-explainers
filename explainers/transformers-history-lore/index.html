@@ -7,7 +7,7 @@
 <style>
 :root { /* tokens:start */
   color-scheme: light dark;
-  /* Colour: light-dark(light, dark). Every text/surface pair here is ≥4.5:1; --focus and --border-strong ≥3:1. */
+  /* Colour: light-dark(light, dark). Allowed pairs, both schemes: text --text, --text-2, --accent, --ok, --warn, --danger only on --bg, --surface or --surface-2 (≥4.5:1, lowest 5.23); --on-accent only on --accent (6.70/8.96); --focus and --border-strong on --bg, --surface or --surface-2 (≥3:1, lowest 4.34). Any other pair is a defect (--text-2 on --accent is 1.11:1). */
   --bg: light-dark(#f7f6f2, #131518);        --surface: light-dark(#ffffff, #1c1f24);
   --surface-2: light-dark(#ecebe5, #272b32); --border: light-dark(#cfccc3, #3d424b);
   --border-strong: light-dark(#6f6c64, #8a8f99);
@@ -37,8 +37,8 @@ h1, h2, h3 { line-height: var(--leading-tight); font-weight: var(--weight-bold);
 h1 { font-size: var(--text-2xl); } h2 { font-size: var(--text-xl); } h3 { font-size: var(--text-lg); }
 p, li, dd { max-width: var(--measure); overflow-wrap: break-word; }
 pre { white-space: pre-wrap; overflow-wrap: anywhere; }  /* long error lines must wrap at 390px, not overflow */
-fieldset { min-inline-size: 0; } img, svg, video { max-inline-size: 100%; block-size: auto; }
-button, summary, label:has(input) { min-block-size: var(--target); }  a { color: var(--accent); text-underline-offset: .15em; }
+fieldset { min-inline-size: 0; } img, svg, video { max-inline-size: 100%; block-size: auto; }  @media (forced-colors: active) { svg circle, svg line { stroke: CanvasText !important; } svg circle { fill: Canvas !important; } svg text { fill: CanvasText !important; } }
+button, input, select, textarea { font: inherit; }  button, summary, label:has(input) { min-block-size: var(--target); min-inline-size: var(--target); }  label:has(input) { display: flex; align-items: center; gap: var(--space-2); }  a { color: var(--accent); text-underline-offset: .15em; }
 :focus-visible { outline: 3px solid; outline-color: var(--focus); outline-offset: 2px; box-shadow: 0 0 0 2px var(--bg); } /* tokens:end */
 
 /* ---- Layout (one breakpoint: 40rem) ---- */
@@ -81,7 +81,7 @@ ol.source-note { padding-inline-start: var(--space-5); }
   border-radius: var(--radius-full); padding: 0 var(--space-2); margin-inline-start: var(--space-1); white-space: nowrap; }
 sup.src-ref { font-size: var(--text-xs); color: var(--text-2); }
 
-button { font: inherit; color: var(--text); }
+button { color: var(--text); }
 .btn, .chip { background: var(--surface); border: 1px solid; border-color: var(--border-strong); cursor: pointer;
   transition: background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
 .btn { border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); font-weight: var(--weight-bold); min-inline-size: var(--target); }
@@ -98,8 +98,8 @@ button { font: inherit; color: var(--text); }
 summary { cursor: pointer; display: flex; align-items: center; gap: var(--space-2); list-style: none;
   transition: background-color var(--dur-fast) var(--ease-out); }
 summary::-webkit-details-marker { display: none; }
-summary::before { content: "\25B8"; flex: none; }
-details[open] > summary::before { content: "\25BE"; }
+summary::before { content: "\25B8" / ""; flex: none; }
+details[open] > summary::before { content: "\25BE" / ""; }
 details > summary + * { margin-block-start: var(--space-3); }
 details.disc { padding-block: 0; }
 .topic { padding: 0 var(--space-4); }
@@ -167,7 +167,8 @@ dl.facts dd { margin: 0; font-size: var(--text-sm); }
 
 /* Continuity map */
 .map-svg { display: block; inline-size: 560px; max-inline-size: 100%; overflow: visible; margin-block: var(--space-4); }
-@media (width < 40rem) { .map-svg { display: none; } }
+/* Named deviation from EXPLAINER.md §9 "never display: none" (approved on CYB-27): below 40rem there is no map, so the Skip map row goes with it. */
+@media (width < 40rem) { .map-svg, .map-tools { display: none; } }
 .map-svg circle { fill: var(--surface); stroke: var(--accent); stroke-width: 2; }
 .map-svg line { stroke: var(--border-strong); stroke-width: 1.5; }
 .map-svg line.dashed { stroke-dasharray: 6 4; }
@@ -210,12 +211,6 @@ h3 > a.plain { color: inherit; }
 .error .error-title { font-weight: var(--weight-bold); }
 pre { background: var(--surface-2); border-radius: var(--radius-sm); padding: var(--space-3); font-family: var(--font-mono); font-size: var(--text-xs); margin: 0; }
 .error pre { background: var(--surface); }
-
-@media (forced-colors: active) {
-  .map-svg circle { stroke: CanvasText; fill: Canvas; }
-  .map-svg line { stroke: CanvasText; }
-  .map-svg text { fill: CanvasText; }
-}
 </style>
 <noscript><style>.nojs { display: none; }</style></noscript>
 </head>
@@ -308,7 +303,6 @@ pre { background: var(--surface-2); border-radius: var(--radius-sm); padding: va
 
 <footer class="wrap">
   <p id="footer-note"></p>
-  <p>To see the error state, add <code>?fail=characters</code> (or <code>timeline</code>, <code>lore</code>, <code>continuities</code>, <code>quiz</code>) to this page's address.</p>
 </footer>
 
 <script>
@@ -318,6 +312,10 @@ pre { background: var(--surface-2); border-radius: var(--radius-sm); padding: va
    A source is { ref, loc } where ref names an entry in DATA.sources.
    null means unknown and renders as "unknown". Nothing here is a guess.
    Dates are exactly as precise as their source: "1984" stays "1984".
+   A claim that more than one view shows is typed once, in DATA.claims. A record points at it with
+   claim: "<id>", or claims: [...] when it combines several. An item in claims is either a claim id or,
+   for a sentence only that record uses, an inline { text, source }. A record that has claims has no
+   text of its own. Views add framing (title, date, label, links), never a reworded copy.
    ===================================================================== */
 const DATA = {
   meta: {
@@ -340,13 +338,81 @@ const DATA = {
     "wp-anim": { title: "Wikipedia: List of Transformers animated series", url: "https://en.wikipedia.org/wiki/List_of_Transformers_animated_series" }
   },
 
-  /* Eras, in order of start year. Overlaps are real: IDW began while the Unicron Trilogy was running. */
+  /* Claims shown by more than one view. Change a sentence here and every view that points at it follows.
+     Where the copies were worded differently, the wording the comparison view carried (already checked) is kept. */
+  claims: {
+    "toys-1984": { text: "The franchise began in 1984 with a toy line made of Takara's Diaclone and Micro Change robots, rebranded for Western markets.",
+      source: { ref: "wp-franchise", loc: "lead and Generation 1 (1984–1993)" } },
+
+    "g1-cybertron-war": { text: "In the G1 cartoon's premise, the Autobots and Decepticons have waged civil war on Cybertron for eons. The planet is decimated and both factions scavenge for energon.",
+      source: { ref: "wp-g1", loc: "Premise" } },
+    "g1-ark": { text: "The Autobots leave in a spaceship, the Decepticons follow, and the ship crashes on prehistoric Earth.",
+      source: { ref: "wp-g1", loc: "Premise" } },
+    "quintessons-create": { text: "The Quintessons are the creators of the Autobots and Decepticons, revealed in the third season; they also created the factory that would become Cybertron.",
+      source: { ref: "wp-g1", loc: "Premise" } },
+    "primus-uk-creator": { text: "Primus is the creator of the Transformers; Cybertron is his material body.",
+      source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
+    "bm-organic": { text: "In Beast Machines, Cybertron is revealed to have organic origins.",
+      source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
+    "prime-primus-core": { text: "Primus is the creator of the Transformers and Unicron's brother; Cybertron's core is Primus.",
+      source: { ref: "wp-prime", loc: "Characters › Miscellaneous; Synopsis › Predacons Rising" } },
+
+    "film86-prime-dies": { text: "In The Transformers: The Movie, the mortally wounded Prime gives the Matrix to Ultra Magnus, then drops it as he dies.",
+      source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-optimus", loc: "History" }] },
+    "matrix-g1-cartoon": { text: "The \"Autobot Matrix of Leadership\": Hot Rod harnesses it, becomes Rodimus Prime and destroys Unicron.",
+      source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
+    "optimus-revived": { text: "Prime is revived in the final episode of the cartoon's third season.",
+      source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-optimus", loc: "History" }] },
+    "optimus-role": { text: "Optimus Prime is the supreme commander of the Autobots and the franchise's main protagonist, opposing the Decepticon leader Megatron.",
+      source: { ref: "wp-optimus", loc: "lead" } },
+    "matrix-marvel": { text: "Prime wields the Creation Matrix, which gives life to machines.",
+      source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
+    "matrix-aligned": { text: "Optimus uses it to knock Unicron back into hibernation, at the expense of his memories, and Jack later uses it to restore Optimus's lost memories.",
+      source: { ref: "wp-prime", loc: "Synopsis › Season 1 and Season 2" } },
+
+    "megatron-gladiator": { text: "A former gladiator on Cybertron who gave rise to the Decepticons and started the civil war.",
+      source: { ref: "wp-megatron", loc: "History" } },
+    "megatron-bw": { text: "A different character who named himself after his predecessor, leads the Predacons and transforms into a Tyrannosaurus.",
+      source: { ref: "wp-megatron", loc: "History" } },
+    "bw-descend": { text: "The Maximals are the descendants of the Autobots and the Predacons are the descendants of the Decepticons.",
+      source: { ref: "wp-bw", loc: "Premise" } },
+    "bw-crash": { text: "Maximals and Predacons, from 300 years after the Great War, crash-land on prehistoric Earth and take beast forms.",
+      source: [{ ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }, { ref: "wp-bw", loc: "lead and Premise" }] },
+    "bw-original-optimus": { text: "Beast Wars features the original Optimus Prime.",
+      source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
+
+    "idw-furman": { text: "Writer Simon Furman left out the Ark crash storyline, separating the fictional universe from the Beast Wars one.",
+      source: { ref: "wp-idw", loc: "First era" } },
+    "cybertron-reboot": { text: "Cybertron was meant by its Japanese producers as another complete reboot, with no ties to Armada or Energon.",
+      source: { ref: "wp-anim", loc: "Unicron Trilogy" } },
+    "cybertron-hasbro": { text: "When Hasbro released it in its own markets in mid-2005 it modified the show to establish its place in continuity.",
+      source: { ref: "wp-anim", loc: "Unicron Trilogy" } },
+    "ut-minicons": { text: "The Mini-Cons of Armada are revealed by the end to be weapons of Unicron.",
+      source: [{ ref: "wp-armada", loc: "Production and release" }, { ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] },
+    "ut-blackhole": { text: "At the end of Energon his destruction creates a black hole that threatens the universe.",
+      source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] },
+
+    "aligned-unify": { text: "Created to unify every Transformers medium into one continuity, yet its video games, novels and TV series ended up contradicting each other.",
+      source: { ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" } },
+    "aligned-team": { text: "Team Prime fights the Decepticons on Earth.",
+      source: [{ ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" }, { ref: "wp-prime", loc: "lead and Premise" }] },
+    "unicron-aligned": { text: "The ancient enemy of the Transformers and of their creator Primus, his brother. After his defeat he unwillingly became Earth's core. His blood, Dark Energon, is a recurring plot element.",
+      source: { ref: "wp-prime", loc: "Characters › Miscellaneous" } },
+
+    "bumblebee-bw-rights": { text: "Wikipedia says Bumblebee could not appear in Beast Wars because Hasbro had lost the rights to his name, but it rests that on a single CBR article (\"Transformers: Every Version of Bumblebee, Explained\").",
+      source: { ref: "wp-bumblebee", loc: "History" } },
+    "allspark-hunt": { text: "Both factions hunt a lost artifact called the AllSpark, the source of all Cybertronian life.",
+      source: { ref: "wp-film", loc: "lead and Plot" } }
+  },
+
+  /* Eras, in order of start year. Overlaps are real: IDW began while the Unicron Trilogy was running.
+     summary is the era's own text; claims replaces it where the sentence is shared. source backs name, years and summary. */
   eras: [
     { id: "g1", name: "Generation 1", years: "1984–1993",
       summary: "The original toy line with its Marvel comic and animated series. Wikipedia's franchise article dates Generation 1 characters to 1984–1993; its Generation 1 article dates the toy line itself to 1984–1990.",
       source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-g1", loc: "lead" }] },
     { id: "bw", name: "Beast era", years: "1996–2000",
-      summary: "A reboot after weak sales of the Generation 2 line: Maximals and Predacons who take beast forms, in Beast Wars and Beast Machines.",
+      claims: [{ text: "A reboot after weak sales of the Generation 2 line, in Beast Wars and Beast Machines.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }, "bw-crash"],
       source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
     { id: "ut", name: "Unicron Trilogy", years: "2002–2006",
       summary: "Armada, Energon and Cybertron: three series launched from 2002, co-productions between Takara and Hasbro, 52 episodes each.",
@@ -358,130 +424,117 @@ const DATA = {
       summary: "Michael Bay's 2007 film started a live-action film series, distinct from previous incarnations. This era is on the timeline but not on the continuity map.",
       source: { ref: "wp-franchise", loc: "Live-action film franchise (2007–present)" } },
     { id: "aligned", name: "Aligned continuity", years: "2010–2021",
-      summary: "Hasbro's attempt to unify its media into one continuity. The name \"Aligned\" was adopted by fans after Hasbro referred to an \"Aligned Continuity\"; it is not an official name.",
+      claims: ["aligned-unify", { text: "The name \"Aligned\" was adopted by fans after Hasbro referred to an \"Aligned Continuity\"; it is not an official name.", source: { ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" } }],
       source: { ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" } }
   ],
 
   /* Timeline entries. date.iso is exactly as precise as the source; date null renders "date unknown". */
   entries: [
     { id: "toys-1984", eraId: "g1", date: { iso: "1984" }, title: "Hasbro rebrands Takara's robots as Transformers",
-      text: "The franchise began in 1984 with a toy line made of Takara's Diaclone and Micro Change robots, rebranded for Western markets.",
+      claim: "toys-1984",
       more: { text: "Marvel Comics was hired to create the backstory. Jim Shooter wrote an overall story, Dennis O'Neil created the name \"Optimus Prime\", and Bob Budiansky was chosen to create the characters.",
-        source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
-      source: { ref: "wp-franchise", loc: "lead and Generation 1 (1984–1993)" } },
+        source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } } },
     { id: "cartoon-1984", eraId: "g1", date: { iso: "1984", confidence: "approximate" }, title: "The cartoon and Marvel comic arrive with the toys",
-      text: "The animated series, made by Sunbow Productions and Marvel Productions, began around the same time as the toys. The U.S. Marvel comic ran 80 issues.",
+      text: "The animated series, made by Sunbow Productions and Marvel Productions, began around the same time as the toys.",
       loreId: "split",
       source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993); Marvel comics (1984-1995)" } },
     { id: "movie-1986", eraId: "g1", date: { iso: "1986" }, title: "The Transformers: The Movie",
-      text: "The film introduces the Matrix as the \"Autobot Matrix of Leadership\". A fatally wounded Optimus Prime hands it on; Hot Rod ends up with it, becomes Rodimus Prime, and destroys Unicron.",
+      claims: ["film86-prime-dies", "matrix-g1-cartoon"],
       more: { text: "Unicron re-creates a heavily damaged Megatron as Galvatron. Optimus Prime's death was meant to make way for a new wave of toys, and the film faced significant backlash for it.",
         source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-optimus", loc: "History" }] },
-      loreId: "matrix",
-      source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
+      loreId: "matrix" },
     { id: "quintessons-1986", eraId: "g1", date: { iso: "1986", confidence: "approximate" }, title: "The Quintessons are revealed as the Transformers' creators",
-      text: "The cartoon's third season, which began in 1986, brought the five-faced Quintessons to prominence and later revealed them as the creators of the Autobots and Decepticons.",
+      claims: [{ text: "The cartoon's third season, which began in 1986, brought the five-faced Quintessons to prominence.",
+          source: [{ ref: "wp-g1", loc: "Premise" }, { ref: "wp-anim", loc: "Transformers: Generation 1" }] }, "quintessons-create"],
       more: { text: "The date is approximate because the sources place the reveal \"in the third season\" without saying which year it aired.", source: { ref: "wp-g1", loc: "Premise" } },
-      loreId: "cybertron", cmpId: "origins",
-      source: [{ ref: "wp-g1", loc: "Premise" }, { ref: "wp-anim", loc: "Transformers: Generation 1" }] },
+      loreId: "cybertron", cmpId: "origins" },
     { id: "primus-uk", eraId: "g1", date: null, title: "Primus appears as creator in the UK Marvel comic",
-      text: "In the UK comic, Primus is introduced as the creator of the Transformers, who were made to serve his material body, the planet Cybertron, and to fight his nemesis Unicron.",
+      claim: "primus-uk-creator",
       more: { text: "The source does not say when in the UK comic's run this happened, so no date is given.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
-      loreId: "cybertron", cmpId: "origins",
-      source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
+      loreId: "cybertron", cmpId: "origins" },
     { id: "marvel-end", eraId: "g1", date: { iso: "1991" }, title: "The U.S. Marvel comic ends",
       text: "The U.S. comic lasted 80 issues, until 1991.",
       source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
 
     { id: "bw-debut", eraId: "bw", date: { iso: "1996-09-16" }, title: "Beast Wars: Transformers debuts",
-      text: "The series, produced by Mainframe Entertainment of Vancouver, follows Maximals and Predacons who crash-land on a planet and take beast forms. Maximals are descendants of the Autobots, Predacons of the Decepticons.",
-      more: { text: "It is described as one of the earliest fully CGI television shows, and it is set 300 years after the Great War.", source: { ref: "wp-bw", loc: "lead and Premise" } },
-      loreId: "split", cmpId: "join",
-      source: { ref: "wp-bw", loc: "lead and Premise" } },
+      claims: [{ text: "The series is produced by Mainframe Entertainment of Vancouver.", source: { ref: "wp-bw", loc: "lead and Premise" } }, "bw-crash", "bw-descend"],
+      more: { text: "It is described as one of the earliest fully CGI television shows.", source: { ref: "wp-bw", loc: "lead and Premise" } },
+      loreId: "split", cmpId: "join" },
     { id: "bw-machines", eraId: "bw", date: null, title: "Beast Machines: Cybertron has organic origins",
-      text: "In the two-season follow-up Beast Machines, Cybertron is revealed to have organic origins, which Megatron attempts to stamp out.",
+      claims: ["bm-organic", { text: "Megatron attempts to stamp out the organic origins.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }],
       more: { text: "The sources dated give the Beast era as 1996–2000 but no airdate for this reveal, so no date is given.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
-      loreId: "cybertron", cmpId: "origins",
-      source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
+      loreId: "cybertron", cmpId: "origins" },
     { id: "bw-end", eraId: "bw", date: { iso: "1999-05-07" }, title: "Beast Wars ends",
       text: "The series concluded on this date, having debuted in 1996.",
       source: { ref: "wp-bw", loc: "lead" } },
 
     { id: "armada", eraId: "ut", date: { iso: "2002-08-23" }, title: "Transformers: Armada premieres",
-      text: "The series premiered on Cartoon Network, in the Toonami block. Autobots and Decepticons discover the powerful Mini-Cons on Earth, who are revealed by the end to be weapons of Unicron.",
-      cmpId: "unicron",
-      source: [{ ref: "wp-armada", loc: "Production and release" }, { ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }] },
+      claims: [{ text: "The series premiered on Cartoon Network, in the Toonami block.", source: { ref: "wp-armada", loc: "Production and release" } },
+        { text: "Autobots and Decepticons discover the powerful Mini-Cons on Earth.", source: [{ ref: "wp-armada", loc: "Production and release" }, { ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }] },
+        "ut-minicons"],
+      cmpId: "unicron" },
     { id: "cybertron-jp", eraId: "ut", date: { iso: "2005-01" }, title: "Cybertron debuts in Japan as Galaxy Force",
-      text: "Its Japanese producers intended a complete reboot with no connections to Armada or Energon. When Hasbro released it in its own markets in mid-2005 it modified the show to establish its place in continuity.",
-      cmpId: "join",
-      source: { ref: "wp-anim", loc: "Unicron Trilogy" } },
+      claims: ["cybertron-reboot", "cybertron-hasbro"],
+      cmpId: "join" },
 
     { id: "idw-start", eraId: "idw", date: { iso: "2005-10" }, title: "IDW's Transformers comics begin",
-      text: "After Dreamwave Productions shut down, IDW won the licence. Writer Simon Furman excluded the Ark crash storyline from The Transformers: Infiltration, separating its universe from Beast Wars'.",
+      claims: [{ text: "After Dreamwave Productions shut down, IDW won the licence.", source: { ref: "wp-idw", loc: "lead and First era" } }, "idw-furman"],
       more: { text: "Issue #0 was planned for October 2005, with the ongoing series Infiltration beginning in January 2006.", source: { ref: "wp-idw", loc: "First era" } },
-      cmpId: "join",
-      source: { ref: "wp-idw", loc: "lead and First era" } },
+      cmpId: "join" },
     { id: "idw-end", eraId: "idw", date: { iso: "2018-11" }, title: "IDW's run ends with Unicron",
       text: "The run ended after the six-issue Unicron event comic. A new series in 2019 rebooted and succeeded it.",
       source: { ref: "wp-idw", loc: "lead" } },
 
     { id: "film-2007", eraId: "film", date: { iso: "2007-07-03" }, title: "Transformers (2007) is released in the U.S.",
-      text: "Michael Bay's film had premiered on June 10, 2007 in Seoul. Both factions hunt a lost artifact called the AllSpark, the source of all Cybertronian life.",
-      loreId: "allspark",
-      source: { ref: "wp-film", loc: "lead and Plot" } },
+      claims: [{ text: "Michael Bay's film had premiered on June 10, 2007 in Seoul.", source: { ref: "wp-film", loc: "lead and Plot" } }, "allspark-hunt"],
+      loreId: "allspark" },
 
     { id: "prime-start", eraId: "aligned", date: { iso: "2010-11-26" }, title: "Transformers: Prime premieres",
-      text: "The series aired on The Hub. Team Prime fights the Decepticons on Earth; the show sits in the Aligned continuity with related books and video games.",
-      loreId: "matrix",
-      source: { ref: "wp-prime", loc: "lead and Premise" } },
+      claims: [{ text: "The series aired on The Hub.", source: { ref: "wp-prime", loc: "lead and Premise" } }, "aligned-team",
+        { text: "The show sits in the Aligned continuity with related books and video games.", source: { ref: "wp-prime", loc: "lead and Premise" } }],
+      loreId: "matrix" },
     { id: "prime-end", eraId: "aligned", date: { iso: "2013-10-04" }, title: "Prime's series concludes",
-      text: "The series concluded on October 4, 2013 with the TV film Predacons Rising. In it Unicron seeks to kill Cybertron's core, which is actually his brother Primus.",
-      loreId: "cybertron", cmpId: "unicron",
-      source: { ref: "wp-prime", loc: "lead and Synopsis › Predacons Rising" } }
+      claims: [{ text: "The series concluded on October 4, 2013 with the TV film Predacons Rising.", source: { ref: "wp-prime", loc: "lead" } },
+        { text: "In it Unicron seeks to kill Cybertron's core.", source: { ref: "wp-prime", loc: "Synopsis › Predacons Rising" } }, "prime-primus-core"],
+      loreId: "cybertron", cmpId: "unicron" }
   ],
 
-  /* Lore topics. Level 0: name + gist (≤25 words). Level 1: paragraphs (≤60 words). Level 2: variants. */
+  /* Lore topics. Level 0: name + gist (≤25 words). Level 1: paragraphs (≤60 words). Level 2: variants.
+     A paragraph or variant may carry a label, shown before its text, as the comparisons do. */
   lore: [
     { id: "cybertron", name: "Cybertron", gist: "The Transformers' home world, shown ruined by civil war in the G1 cartoon and described very differently from one continuity to the next.",
       paragraphs: [
-        { text: "In the G1 cartoon's premise, the Autobots and Decepticons have waged civil war on Cybertron for eons. The planet is decimated and both factions scavenge for energon. The Autobots leave in a spaceship, the Decepticons follow, and the ship crashes on prehistoric Earth.",
-          source: { ref: "wp-g1", loc: "Premise" } },
-        { text: "The same article says the cartoon's third season revealed the Quintessons as the creators of the Autobots and Decepticons, and that they also created a gigantic factory that would become Cybertron.",
-          cmpId: "origins", source: { ref: "wp-g1", loc: "Premise" } }
+        { claims: ["g1-cybertron-war", "g1-ark"] },
+        { label: "G1 cartoon", claim: "quintessons-create", cmpId: "origins" }
       ],
       variants: [
-        { continuityId: "g1", label: "G1, UK Marvel comic", text: "Primus is the creator of the Transformers, who were made to serve his material body, the planet Cybertron, and to fight his nemesis Unicron.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
-        { continuityId: "bw", text: "Beast Machines reveals Cybertron to have organic origins. The Beast Wars franchise also takes from the comics the idea of Cybertron having an organic core.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
-        { continuityId: "aligned", text: "In Predacons Rising, Cybertron's core is actually Primus, brother of Unicron.", source: { ref: "wp-prime", loc: "Synopsis › Predacons Rising" } }
+        { continuityId: "g1", label: "G1, UK Marvel comic", claim: "primus-uk-creator" },
+        { continuityId: "bw", claims: ["bm-organic", { text: "The Beast Wars franchise also takes from the comics the idea of Cybertron having an organic core.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }] },
+        { continuityId: "aligned", claim: "prime-primus-core" }
       ] },
     { id: "allspark", name: "The AllSpark", gist: "In the 2007 film, a lost artifact that both factions hunt: the source of all Cybertronian life.",
       paragraphs: [
-        { text: "In the 2007 live-action film, Cybertron was ravaged by a civil war between the Autobots, led by Optimus Prime, and the Decepticons, led by Megatron. Both search for a lost artifact called the AllSpark, the source of all Cybertronian life.",
-          source: { ref: "wp-film", loc: "Plot" } },
+        { claims: [{ text: "In the 2007 live-action film, Cybertron was ravaged by a civil war between the Autobots, led by Optimus Prime, and the Decepticons, led by Megatron.", source: { ref: "wp-film", loc: "Plot" } }, "allspark-hunt"] },
         { text: "During development, producers Don Murphy and Tom DeSanto made the Creation Matrix their plot device, but Murphy had it renamed because of the film series The Matrix.", source: [{ ref: "wp-film", loc: "Production and infobox (producers)" }] }
       ],
       note: "This topic covers the film's account only. The films are not one of the five continuities on the map, and this page has not sourced how the AllSpark is treated elsewhere. The source does not say what the Creation Matrix was renamed to." },
     { id: "primes", name: "The Primes", gist: "Optimus Prime leads the Autobots; G1 gives him a successor, Rodimus Prime, and Aligned adds the Thirteen, the original Primes.",
       paragraphs: [
-        { text: "Optimus Prime is the supreme commander of the Autobots and the franchise's main protagonist, opposing the Decepticon leader Megatron. His original name, in some continuities, is Orion Pax.",
-          source: { ref: "wp-optimus", loc: "lead" } },
-        { text: "In The Transformers: The Movie, the mortally wounded Prime gives the Matrix to Ultra Magnus, then drops it as he dies. Hot Rod catches it and later becomes Rodimus Prime. Prime is revived in the final episode of the cartoon's third season.",
-          source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-optimus", loc: "History" }] },
+        { claims: ["optimus-role", { text: "His original name, in some continuities, is Orion Pax.", source: { ref: "wp-optimus", loc: "lead" } }] },
+        { claims: ["film86-prime-dies", "optimus-revived"], cmpId: "matrix" },
         { text: "In Transformers: Prime, Alpha Trion, Optimus's deceased mentor who appears as a vision, is a member of the Thirteen, the original Primes.",
           source: { ref: "wp-prime", loc: "Characters › Miscellaneous" } }
       ],
       variants: [
-        { continuityId: "bw", text: "Beast Wars features the original Optimus Prime. Megatron attempts to kill him, and at the start of the third season Optimus Primal manages to preserve his spark.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }
+        { continuityId: "bw", claims: ["bw-original-optimus", { text: "Megatron attempts to kill him, and at the start of the third season Optimus Primal manages to preserve his spark.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }] }
       ] },
     { id: "matrix", name: "The Matrix of Leadership", gist: "An artifact tied to Autobot leadership; what it is and what it does differs between the G1 cartoon, the G1 comic and Aligned.",
       paragraphs: [
-        { text: "The 1986 film introduces the Matrix as the \"Autobot Matrix of Leadership\". Unicron fears its power. Hot Rod eventually harnesses it, becomes Rodimus Prime, and destroys Unicron.",
-          cmpId: "matrix", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } }
+        { label: "G1 cartoon, 1986 film", claims: ["matrix-g1-cartoon", { text: "Unicron fears the Matrix's power.", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } }], cmpId: "matrix" }
       ],
       variants: [
-        { continuityId: "g1", label: "G1, Marvel comic", text: "Prime wields the Creation Matrix from early on, and it gives life to machines.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
-        { continuityId: "aligned", text: "In Prime, Optimus uses the Matrix of Leadership to knock Unicron back into hibernation, at the expense of his memories. Later, Jack obtains Optimus's memories from Vector Sigma and restores them to him via the Matrix.",
-          source: { ref: "wp-prime", loc: "Synopsis › Season 1 and Season 2" } }
+        { continuityId: "g1", label: "G1, Marvel comic", claim: "matrix-marvel" },
+        { continuityId: "aligned", claim: "matrix-aligned" }
       ] },
     { id: "split", name: "The Autobot/Decepticon split", gist: "How a civil war between two Cybertronian factions began depends on which telling you read.",
       paragraphs: [
@@ -489,8 +542,8 @@ const DATA = {
           cmpId: "megatron", source: { ref: "wp-g1", loc: "Premise" } }
       ],
       variants: [
-        { continuityId: "g1", label: "G1, Marvel comic", text: "Megatron is a former gladiator on Cybertron who gave rise to the Decepticons and started a civil war against the Autobots led by Optimus Prime.", source: { ref: "wp-megatron", loc: "History" } },
-        { continuityId: "bw", text: "The Maximals are the descendants of the Autobots and the Predacons are the descendants of the Decepticons.", source: { ref: "wp-bw", loc: "Premise" } },
+        { continuityId: "g1", label: "G1, Marvel comic", claim: "megatron-gladiator" },
+        { continuityId: "bw", claim: "bw-descend" },
         { label: "Transformers One (2024 film; not one of the five continuities)", text: "Megatron is D-16, a miner who takes the name after killing Sentinel Prime. His friend Orion Pax gains the Matrix and becomes Optimus Prime, starting the civil war.", source: { ref: "wp-megatron", loc: "History" } }
       ] }
   ],
@@ -504,16 +557,18 @@ const DATA = {
     { id: "leader", name: "Leader" }, { id: "second", name: "Second-in-command" }, { id: "scout", name: "Scout" },
     { id: "creator", name: "Creator" }, { id: "antagonist", name: "Antagonist" }
   ],
-  /* profileSource backs faction, era and role. firstAppearance null renders "unknown". */
+  /* profileSource backs faction, era and role. firstAppearance null renders "unknown".
+     description is { text, source } or { claims }; cmpId links the comparison where the accounts differ. */
   characters: [
     { id: "optimus-prime", name: "Optimus Prime", factions: ["autobot"], eras: ["g1", "bw", "ut", "film", "aligned"], roles: ["leader"],
       profileSource: [{ ref: "wp-optimus", loc: "lead, History and infobox (voice credits)" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000); Live-action film franchise (2007–present)" }, { ref: "wp-prime", loc: "Synopsis" }],
       firstAppearance: { value: "1984", source: { ref: "wp-optimus", loc: "infobox (first appearance)" } },
-      description: { text: "Supreme commander of the Autobots and the franchise's main protagonist. Killed in the 1986 film and revived in the cartoon's third-season finale.", source: { ref: "wp-optimus", loc: "lead and History" } } },
+      description: { claims: ["optimus-role", "film86-prime-dies", "optimus-revived"] } },
     { id: "megatron", name: "Megatron", factions: ["decepticon"], eras: ["g1", "film", "aligned"], roles: ["leader", "antagonist"],
       profileSource: [{ ref: "wp-megatron", loc: "lead and History" }, { ref: "wp-prime", loc: "Synopsis" }],
       firstAppearance: { value: "1984", source: { ref: "wp-megatron", loc: "History" } },
-      description: { text: "Leader of the Decepticons and Optimus Prime's archenemy. A ruthless dictator in the cartoon, a former gladiator in the Marvel comic. The Beast Wars Megatron is a different character.", source: { ref: "wp-megatron", loc: "History" } } },
+      description: { text: "Leader of the Decepticons and Optimus Prime's archenemy.", source: { ref: "wp-megatron", loc: "History" } },
+      cmpId: "megatron" },
     { id: "starscream", name: "Starscream", factions: ["decepticon"], eras: ["g1", "bw", "film", "aligned", "idw"], roles: ["second"],
       profileSource: [{ ref: "wp-starscream", loc: "lead and History" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }, { ref: "wp-prime", loc: "Synopsis" }],
       firstAppearance: { value: "1984", source: { ref: "wp-starscream", loc: "infobox (first appearance)" } },
@@ -521,11 +576,12 @@ const DATA = {
     { id: "bumblebee", name: "Bumblebee", factions: ["autobot"], eras: ["g1", "film", "aligned"], roles: ["scout"],
       profileSource: { ref: "wp-bumblebee", loc: "lead and History" },
       firstAppearance: { value: "1984", source: { ref: "wp-bumblebee", loc: "History" } },
-      description: { text: "A small Autobot scout, a yellow Volkswagen Beetle in the original toys and cartoon. He could not appear in Beast Wars because Hasbro had lost the rights to his name.", source: { ref: "wp-bumblebee", loc: "History" } } },
+      description: { claims: [{ text: "A small Autobot scout, a yellow Volkswagen Beetle in the original toys and cartoon.", source: { ref: "wp-bumblebee", loc: "lead and History" } }, "bumblebee-bw-rights"] } },
     { id: "rodimus-prime", name: "Rodimus Prime", factions: ["autobot"], eras: ["g1"], roles: ["leader"],
       profileSource: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" },
       firstAppearance: { value: "1986", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
-      description: { text: "Hot Rod catches the Matrix as Optimus Prime dies in the 1986 film; harnessing it, he becomes Rodimus Prime and destroys Unicron.", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } } },
+      description: { claim: "matrix-g1-cartoon" },
+      cmpId: "matrix" },
     { id: "galvatron", name: "Galvatron", factions: ["decepticon"], eras: ["g1", "film"], roles: ["antagonist"],
       profileSource: { ref: "wp-megatron", loc: "History" },
       firstAppearance: { value: "1986", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
@@ -533,41 +589,48 @@ const DATA = {
     { id: "unicron", name: "Unicron", factions: ["neither"], eras: ["g1", "ut", "film", "aligned", "idw"], roles: ["antagonist"],
       profileSource: [{ ref: "wp-unicron", loc: "Fictional character biography" }, { ref: "wp-anim", loc: "Unicron Trilogy" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }, { ref: "wp-idw", loc: "lead" }],
       firstAppearance: { value: "1986", source: { ref: "wp-unicron", loc: "lead" } },
-      description: { text: "An evil god-like being who can transform into a giant mechanical planet. In Prime he is the ancient enemy of Primus, his brother, and his blood, Dark Energon, is a recurring plot element.", source: [{ ref: "wp-unicron", loc: "lead" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }] } },
+      description: { claims: [{ text: "An evil god-like being who can transform into a giant mechanical planet.", source: { ref: "wp-unicron", loc: "lead" } }, "unicron-aligned"] },
+      cmpId: "unicron" },
     { id: "optimus-primal", name: "Optimus Primal", factions: ["maximal"], eras: ["bw"], roles: ["leader"],
       profileSource: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" },
       firstAppearance: { value: "1996", source: { ref: "wp-anim", loc: "Beast Era › Beast Wars: Transformers" } },
-      description: { text: "Leads a small group of Maximals, the new Autobots, who crash-land with the Predacons 300 years after the Great War.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } } },
+      description: { claims: [{ text: "Leads a small group of Maximals, the new Autobots.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }, "bw-crash"] } },
     { id: "bw-megatron", name: "Megatron (Beast Wars)", factions: ["predacon"], eras: ["bw"], roles: ["leader", "antagonist"],
       profileSource: [{ ref: "wp-megatron", loc: "History" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }],
       firstAppearance: { value: "1996", source: { ref: "wp-anim", loc: "Beast Era › Beast Wars: Transformers" } },
-      description: { text: "Not the 1980s Megatron: he named himself after his predecessor and leads the Predacons, descendants of the Decepticons. He transforms into a Tyrannosaurus.", source: { ref: "wp-megatron", loc: "History" } } },
+      description: { claims: ["megatron-bw", "bw-descend"] },
+      cmpId: "megatron" },
     { id: "primus", name: "Primus", factions: ["neither"], eras: ["g1", "aligned"], roles: ["creator"],
       profileSource: [{ ref: "wp-franchise", loc: "Marvel comics (1984-1995)" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }],
       firstAppearance: null,
-      description: { text: "Creator of the Transformers in the UK Marvel comic, where Cybertron is his body, and in Prime, where he is the brother of Unicron. The cartoon credits the Quintessons instead.", source: [{ ref: "wp-franchise", loc: "Marvel comics (1984-1995)" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }, { ref: "wp-g1", loc: "Premise" }] } },
+      description: { claims: ["primus-uk-creator", "prime-primus-core"] },
+      cmpId: "origins" },
     { id: "quintessons", name: "The Quintessons", factions: ["neither"], eras: ["g1"], roles: ["creator", "antagonist"],
       profileSource: { ref: "wp-g1", loc: "Premise" },
       firstAppearance: { value: "1986", source: { ref: "wp-g1", loc: "Premise" } },
-      description: { text: "A cruel, coldly logical alien race with five faces and tentacles. The movie established them; the cartoon's third season revealed them as the creators of the Autobots and Decepticons.", source: { ref: "wp-g1", loc: "Premise" } } }
+      description: { claims: [{ text: "A cruel, coldly logical alien race with five faces and tentacles. The movie established them.", source: { ref: "wp-g1", loc: "Premise" } }, "quintessons-create"] },
+      cmpId: "origins" }
   ],
 
-  /* Continuities. ORDER HERE IS THE COLUMN ORDER EVERYWHERE; it is not a ranking. */
+  /* Continuities. ORDER HERE IS THE COLUMN ORDER EVERYWHERE; it is not a ranking.
+     A continuity shares its id with an era and takes that era's name and years: they are not typed again here.
+     source backs media and the premise; premise is claims. short is the label on the map. */
   continuities: [
-    { id: "g1", name: "Generation 1 (G1)", short: "G1", years: "1984–1993", media: "Toy line, Marvel comic, animated series, 1986 film",
-      premise: "The Autobots and Decepticons fight a civil war that began on Cybertron and follow it to Earth.",
+    { id: "g1", short: "G1", media: "Toy line, Marvel comic, animated series, 1986 film",
+      claims: ["g1-cybertron-war", "g1-ark"],
       source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-g1", loc: "Premise" }] },
-    { id: "bw", name: "Beast Wars era", short: "Beast Era", years: "1996–2000", media: "Toy line, CGI series Beast Wars, Beast Machines",
-      premise: "Maximals and Predacons crash-land on a planet 300 years after the Great War and take beast forms.",
+    { id: "bw", short: "Beast era", media: "Toy line, CGI series Beast Wars, Beast Machines",
+      claims: ["bw-crash"],
       source: [{ ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }, { ref: "wp-bw", loc: "Premise" }] },
-    { id: "ut", name: "Unicron Trilogy", short: "Unicron", years: "2002–2006", media: "Toy lines and anime series Armada, Energon, Cybertron",
-      premise: "Three anime series, Armada, Energon and Cybertron, in which Unicron plays a major role: from Mini-Cons on Earth to a black hole created by his destruction. Cybertron was made as a stand-alone reboot.",
+    { id: "ut", short: "Unicron Trilogy", media: "Toy lines and anime series Armada, Energon, Cybertron",
+      claims: [{ text: "Three anime series, Armada, Energon and Cybertron, in which Unicron plays a major role.", source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] },
+        "ut-minicons", "ut-blackhole", "cybertron-reboot", "cybertron-hasbro"],
       source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] },
-    { id: "aligned", name: "Aligned continuity", short: "Aligned", years: "2010–2021", media: "Transformers: Prime, video games, novels, other series",
-      premise: "Team Prime fights the Decepticons on Earth; Hasbro meant the continuity to unify its media.",
+    { id: "aligned", short: "Aligned", media: "Transformers: Prime, video games, novels, other series",
+      claims: ["aligned-team", "aligned-unify"],
       source: [{ ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" }, { ref: "wp-prime", loc: "Premise" }] },
-    { id: "idw", name: "IDW comics", short: "IDW", years: "2005–2018", media: "IDW Publishing comics",
-      premise: "Launched in 2005 by writer Simon Furman as a contemporary version of G1, kept apart from Beast Wars; later written by many others.",
+    { id: "idw", short: "IDW", media: "IDW Publishing comics",
+      claims: [{ text: "Launched in 2005 by writer Simon Furman as a contemporary version of G1; later written by many others.", source: { ref: "wp-idw", loc: "lead and First era" } }, "idw-furman"],
       source: { ref: "wp-idw", loc: "lead and First era" } }
   ],
 
@@ -586,37 +649,38 @@ const DATA = {
     { id: "origins", question: "Where do the Transformers and Cybertron come from?",
       positions: [
         { continuityId: "g1", accounts: [
-          { label: "Cartoon", text: "The Quintessons are the creators of the Autobots and Decepticons, revealed in the third season; they also created the factory that would become Cybertron.", source: { ref: "wp-g1", loc: "Premise" } },
-          { label: "UK Marvel comic", text: "Primus is the creator of the Transformers; Cybertron is his material body.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } } ] },
+          { label: "Cartoon", claim: "quintessons-create" },
+          { label: "Cartoon, as the franchise article tells it", text: "The Quintessons used Cybertron as a factory; their robots rebel, and in time the workers become the Autobots and the soldiers become the Decepticons. The article's own note says this appears to contradict the background presented in the first two seasons of the series.", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
+          { label: "UK Marvel comic", claim: "primus-uk-creator" } ] },
         { continuityId: "bw", accounts: [
-          { text: "In Beast Machines, Cybertron is revealed to have organic origins.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } } ] },
+          { claim: "bm-organic" } ] },
         { continuityId: "aligned", accounts: [
-          { text: "Primus is the creator of the Transformers and Unicron's brother; Cybertron's core is Primus.", source: { ref: "wp-prime", loc: "Characters › Miscellaneous; Synopsis › Predacons Rising" } } ] }
+          { claim: "prime-primus-core" } ] }
       ] },
     { id: "megatron", question: "Who is Megatron?",
       positions: [
         { continuityId: "g1", accounts: [
           { label: "Cartoon", text: "A ruthless military dictator who wants to win the war against the Autobots at any cost.", source: { ref: "wp-megatron", loc: "History" } },
-          { label: "Marvel comic", text: "A former gladiator on Cybertron who gave rise to the Decepticons and started the civil war.", source: { ref: "wp-megatron", loc: "History" } } ] },
+          { label: "Marvel comic", claim: "megatron-gladiator" } ] },
         { continuityId: "bw", accounts: [
-          { text: "A different character who named himself after his predecessor, leads the Predacons and transforms into a Tyrannosaurus.", source: { ref: "wp-megatron", loc: "History" } } ] }
+          { claim: "megatron-bw" } ] }
       ] },
     { id: "matrix", question: "What does the Matrix of Leadership do?",
       positions: [
         { continuityId: "g1", accounts: [
-          { label: "Cartoon", text: "The \"Autobot Matrix of Leadership\": Hot Rod harnesses it, becomes Rodimus Prime and destroys Unicron.", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
-          { label: "Marvel comic", text: "Prime wields the Creation Matrix, which gives life to machines.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } } ] },
+          { label: "Cartoon", claim: "matrix-g1-cartoon" },
+          { label: "Marvel comic", claim: "matrix-marvel" } ] },
         { continuityId: "aligned", accounts: [
-          { text: "Optimus uses it to knock Unicron back into hibernation, at the expense of his memories, and Jack later uses it to restore Optimus's lost memories.", source: { ref: "wp-prime", loc: "Synopsis › Season 1 and Season 2" } } ] }
+          { claim: "matrix-aligned" } ] }
       ] },
     { id: "unicron", question: "What is Unicron?",
       positions: [
         { continuityId: "g1", accounts: [
           { text: "In the 1986 film, a Transformer who devours planets and re-creates Megatron as Galvatron. In the UK comic, Primus's nemesis.", source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993); Marvel comics (1984-1995)" }] } ] },
         { continuityId: "ut", accounts: [
-          { text: "The Mini-Cons of Armada are revealed to be his weapons. In Energon the Decepticons and Terrorcons try to resurrect him. At the end of Energon his destruction creates a black hole that threatens the universe.", source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] } ] },
+          { claims: ["ut-minicons", { text: "In Energon the Decepticons and Terrorcons try to resurrect him.", source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] }, "ut-blackhole"] } ] },
         { continuityId: "aligned", accounts: [
-          { text: "The ancient enemy of the Transformers and of their creator Primus, his brother. After his defeat he unwillingly became Earth's core. His blood, Dark Energon, is a recurring plot element.", source: { ref: "wp-prime", loc: "Characters › Miscellaneous" } } ] }
+          { claim: "unicron-aligned" } ] }
       ] },
     { id: "join", question: "Do these stories join up into one history?",
       positions: [
@@ -624,36 +688,36 @@ const DATA = {
           { text: "Planned to start afresh with no ties to what came before, but an off-hand reference to the \"Great War\" in the first episode fed fan speculation.", source: { ref: "wp-anim", loc: "Beast Era › Beast Wars: Transformers" } },
           { text: "The writers then used G1 elements as historical backstory, establishing Beast Wars as part of the Generation 1 universe through many callbacks.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } } ] },
         { continuityId: "ut", accounts: [
-          { text: "Japan's production team wanted a G1 setting; Hasbro's Aaron Archer vetoed it in favour of a complete reboot. Cybertron was meant by its Japanese producers as another complete reboot, with no ties to Armada or Energon.", source: { ref: "wp-anim", loc: "Unicron Trilogy" } } ] },
+          { claims: [{ text: "Japan's production team wanted a G1 setting; Hasbro's Aaron Archer vetoed it in favour of a complete reboot.", source: { ref: "wp-anim", loc: "Unicron Trilogy" } }, "cybertron-reboot"] } ] },
         { continuityId: "aligned", accounts: [
-          { text: "Created to unify every Transformers medium into one continuity, yet its video games, novels and TV series ended up contradicting each other.", source: { ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" } } ] },
+          { claim: "aligned-unify" } ] },
         { continuityId: "idw", accounts: [
-          { text: "Writer Simon Furman left out the Ark crash storyline, separating the fictional universe from the Beast Wars one.", source: { ref: "wp-idw", loc: "First era" } } ] }
+          { claim: "idw-furman" } ] }
       ] }
   ],
 
-  /* Quiz. answer is an index into options. */
+  /* Quiz. answer is an index into options. explanation is text with a source, or claims. */
   quiz: [
     { id: "q-toys", question: "Which toys were rebranded to create the original 1984 Transformers line?",
       options: ["Takara's Diaclone and Micro Change robots", "Original designs by Hasbro's Marvel team", "Beast-shaped robots from Mainframe Entertainment"], answer: 0,
-      explanation: "The 1984 line was made of Takara's Diaclone and Micro Change toys, rebranded for Western markets.",
-      sectionId: "timeline", source: { ref: "wp-franchise", loc: "lead" } },
+      claim: "toys-1984",
+      sectionId: "timeline" },
     { id: "q-creators", question: "In the G1 cartoon, who were revealed as the creators of the Autobots and Decepticons?",
       options: ["Primus", "The Quintessons", "Unicron"], answer: 1,
-      explanation: "The cartoon's third season revealed the Quintessons as the creators. The UK Marvel comic and Aligned continuity instead name Primus.",
-      sectionId: "continuities", source: [{ ref: "wp-g1", loc: "Premise" }, { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }] },
+      claim: "quintessons-create",
+      sectionId: "continuities" },
     { id: "q-beast", question: "In Beast Wars, why do the robots take beast forms?",
       options: ["The planet's energon is at a dangerous level, so they need organic forms to function without going into stasis lock", "The Quintessons ordered it as a punishment", "Beast forms were always their natural shape"], answer: 0,
       explanation: "The crash-landing planet has a dangerous level of energon, which forces them to take organic beast forms in order to function.",
       sectionId: "timeline", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
     { id: "q-bee", question: "Which of these characters could not appear in Beast Wars because Hasbro had lost the rights to the name?",
       options: ["Optimus Prime", "Starscream", "Bumblebee"], answer: 2,
-      explanation: "Bumblebee was left out for that reason. The original Optimus Prime and Starscream both appear in Beast Wars.",
-      sectionId: "characters", source: [{ ref: "wp-bumblebee", loc: "History" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }] },
+      claims: ["bumblebee-bw-rights", "bw-original-optimus", { text: "Starscream also appears in Beast Wars.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }],
+      sectionId: "characters" },
     { id: "q-matrix", question: "In the Marvel comic, what does the Creation Matrix do?",
       options: ["It gives life to machines", "It turns Autobots into Decepticons", "It powers the Ark"], answer: 0,
-      explanation: "The Marvel comic establishes early on that Prime wields the Creation Matrix, which gives life to machines; the cartoon's film calls it the Matrix of Leadership.",
-      sectionId: "lore", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } }
+      claim: "matrix-marvel",
+      sectionId: "lore" }
   ]
 };
 
@@ -666,7 +730,7 @@ const state = {
   era: "all",
   filters: { faction: [], era: [], role: [] },
   openCards: [],
-  quiz: { i: 0, firstTry: {}, checked: false }
+  quiz: { i: 0, firstTry: {} }
 };
 
 function $(sel, root) { return (root || document).querySelector(sel); }
@@ -693,7 +757,9 @@ function byId(list, id, what) {
   if (!found) throw new Error("Unknown " + what + " id: " + id);
   return found;
 }
-const contName = id => byId(DATA.continuities, id, "continuity").name;
+/* A continuity shares its id with an era and takes that era's name and years. */
+const eraOf = c => byId(DATA.eras, c.id, "era");
+const contName = id => eraOf(byId(DATA.continuities, id, "continuity")).name;
 
 /* ---- Sources ---- */
 function sourceItem(s) {
@@ -711,6 +777,29 @@ function sourceNote(src) {
   return h("p", { class: "source-note" }, ...kids);
 }
 const srcKey = s => s.ref + "|" + (s.loc || "");
+function mergeSources(...lists) {
+  const seen = new Set(), out = [];
+  lists.flat().forEach(s => { if (s && !seen.has(srcKey(s))) { seen.add(srcKey(s)); out.push(s); } });
+  return out;
+}
+
+/* ---- Claims: a record's prose is its own `key` text, or the DATA.claims it points at ---- */
+function claimPart(item) {
+  if (typeof item !== "string") return item;
+  const c = DATA.claims[item];
+  if (!c) throw new Error("Unknown claim id: " + item);
+  return c;
+}
+function resolve(rec, key = "text") {
+  const items = [].concat(rec.claim || rec.claims || []);
+  if (!items.length) {
+    if (typeof rec[key] !== "string") throw new Error("Record has neither " + key + " nor claims: " + JSON.stringify(rec).slice(0, 80));
+    return { text: rec[key], source: mergeSources(rec.source) };
+  }
+  if (key in rec) throw new Error("Record has both claims and its own " + key + ": " + rec[key].slice(0, 60));
+  const parts = items.map(claimPart);
+  return { text: parts.map(c => c.text).join(" "), source: mergeSources(...parts.map(c => c.source)) };
+}
 
 /* ---- Dates (display derived from the ISO string, which is never altered) ---- */
 function fmtIso(iso) {
@@ -788,7 +877,8 @@ function initRail() {
   });
 }
 function entryNode(en) {
-  const kids = [h("h3", {}, en.title), h("p", {}, en.text), sourceNote(en.source)];
+  const prose = resolve(en);
+  const kids = [h("h3", {}, en.title), h("p", {}, prose.text), sourceNote(prose.source)];
   if (en.loreId) {
     const topic = byId(DATA.lore, en.loreId, "lore topic");
     kids.push(h("p", {}, "Related lore: ", h("a", { href: "#lore-" + topic.id }, topic.name), "."));
@@ -805,8 +895,9 @@ function renderTimeline(announce) {
   const sel = state.era === "all" ? null : byId(DATA.eras, state.era, "era");
   const entries = DATA.entries.filter(en => !sel || en.eraId === sel.id);
   const list = $("#era-list"), summary = $("#era-summary"), empty = $("#era-empty"), out = $("#era-count");
+  const sum = sel ? resolve(sel, "summary") : null;
   summary.replaceChildren(...(sel ? [
-    h("p", {}, h("strong", {}, sel.name), " · ", sel.years), h("p", {}, sel.summary), sourceNote(sel.source)] : []));
+    h("p", {}, h("strong", {}, sel.name), " · ", sel.years), h("p", {}, sum.text), sourceNote(mergeSources(sel.source, sum.source))] : []));
   empty.replaceChildren();
   if (!entries.length) {
     list.replaceChildren();
@@ -833,17 +924,18 @@ function renderTimeline(announce) {
 function loreTopic(t) {
   const body = [];
   t.paragraphs.forEach(p => {
-    body.push(h("p", {}, p.text));
+    const prose = resolve(p);
+    body.push(h("p", {}, p.label ? [h("strong", {}, p.label), ": "] : null, prose.text));
     if (p.cmpId) body.push(h("p", { class: "meta" }, "Other continuities tell this differently: ", h("a", { href: "#cmp-" + byId(DATA.comparisons, p.cmpId, "comparison").id }, "compare accounts"), "."));
-    body.push(sourceNote(p.source));
+    body.push(sourceNote(prose.source));
   });
   if (t.note) body.push(h("p", { class: "scope" }, t.note));
   if (t.variants && t.variants.length) {
     const cmps = DATA.comparisons.filter(c => t.paragraphs.some(p => p.cmpId === c.id));
     body.push(h("details", { class: "disc variants-wrap" }, h("summary", {}, "In other continuities"),
-      h("ul", { class: "variants" }, t.variants.map(v => h("li", {},
-        h("p", {}, h("strong", {}, v.label || contName(v.continuityId)), ": ", v.text), sourceNote(v.source)))),
-      cmps.length ? h("p", {}, "Compare accounts: ", cmps.map((c, i) => [i ? ", " : "", h("a", { href: "#cmp-" + c.id }, c.question)])) : null));
+      h("ul", { class: "variants" }, t.variants.map(v => { const prose = resolve(v); return h("li", {},
+        h("p", {}, h("strong", {}, v.label || contName(v.continuityId)), ": ", prose.text), sourceNote(prose.source)); })),
+      cmps.length ? h("p", {}, "Compare accounts: ", cmps.flatMap((c, i) => [i ? ", " : "", h("a", { href: "#cmp-" + c.id }, c.question)])) : null));
   }
   return h("details", { class: "topic", id: "lore-" + t.id },
     h("summary", {}, h("div", {}, h("h3", {}, t.name), h("p", { class: "gist" }, t.gist))),
@@ -906,6 +998,25 @@ function describeFilters() {
   return GROUPS.filter(g => state.filters[g.key].length)
     .map(g => g.legend + ": " + state.filters[g.key].map(id => byId(DATA[g.list], id, g.legend).name).join(" or ")).join(" + ");
 }
+/* One Details pattern for character and continuity cards: open state lives in state.openCards, the DOM is derived from it. */
+function detailsButton(id) {
+  const open = state.openCards.includes(id);
+  return h("button", { type: "button", class: "btn", id: "b-" + id, "data-details": id, "aria-labelledby": "b-" + id + " h-" + id, "aria-expanded": open ? "true" : "false" }, open ? "Hide details" : "Details");
+}
+function detailsRegion(id, ...kids) {
+  return h("div", { class: "region", id: "r-" + id, hidden: !state.openCards.includes(id) }, ...kids);
+}
+function toggleDetails(b) {
+  const id = b.dataset.details, i = state.openCards.indexOf(id);
+  if (i < 0) state.openCards.push(id); else state.openCards.splice(i, 1);
+  const open = i < 0;
+  b.setAttribute("aria-expanded", open ? "true" : "false");
+  b.textContent = open ? "Hide details" : "Details";
+  $("#r-" + id).hidden = !open;
+}
+function cmpLink(id) {
+  return id ? h("p", { class: "meta" }, "Accounts differ: ", h("a", { href: "#cmp-" + byId(DATA.comparisons, id, "comparison").id }, byId(DATA.comparisons, id, "comparison").question), ".") : null;
+}
 function cardNode(c) {
   const refs = [], index = {};
   const reg = srcs => [].concat(srcs).map(s => {
@@ -920,8 +1031,7 @@ function cardNode(c) {
     ? h("dd", {}, c.firstAppearance.value, c.firstAppearance.confidence === "approximate" ? h("span", { class: "tag" }, "approx.") : null,
         c.firstAppearance.confidence === "disputed" ? h("span", { class: "tag" }, "disputed") : null, sup(first))
     : h("dd", { class: "unknown" }, "unknown");
-  const open = state.openCards.includes(c.id);
-  const descRefs = [].concat(c.description.source);
+  const desc = resolve(c.description);
   return h("article", { class: "card", id: "char-" + c.id, tabindex: "-1" },
     h("h3", { id: "h-" + c.id }, c.name),
     h("dl", { class: "facts" },
@@ -932,8 +1042,8 @@ function cardNode(c) {
     refs.length > 1
       ? h("ol", { class: "source-note" }, refs.map(s => h("li", {}, sourceItem(s))))
       : sourceNote(refs),
-    h("button", { type: "button", class: "btn", id: "b-" + c.id, "data-details": c.id, "aria-labelledby": "b-" + c.id + " h-" + c.id, "aria-expanded": open ? "true" : "false" }, open ? "Hide details" : "Details"),
-    h("div", { class: "region", id: "r-" + c.id, hidden: !open }, h("p", {}, c.description.text), sourceNote(descRefs)));
+    detailsButton(c.id),
+    detailsRegion(c.id, h("p", {}, desc.text), sourceNote(desc.source), cmpLink(c.cmpId)));
 }
 function renderCards(announce) {
   const shown = DATA.characters.filter(matches), total = DATA.characters.length;
@@ -972,16 +1082,7 @@ function initCharacters() {
   });
   $("#char-clear").addEventListener("click", () => safe("characters", clearFilters));
   $("#char-cards").addEventListener("click", e => {
-    const clear = e.target.closest("[data-clear]");
-    if (clear) { safe("characters", clearFilters); return; }
-    const b = e.target.closest("[data-details]");
-    if (!b) return;
-    const id = b.dataset.details, i = state.openCards.indexOf(id);
-    if (i < 0) state.openCards.push(id); else state.openCards.splice(i, 1);
-    const open = i < 0;
-    b.setAttribute("aria-expanded", open ? "true" : "false");
-    b.textContent = open ? "Hide details" : "Details";
-    $("#r-" + id).hidden = !open;
+    if (e.target.closest("[data-clear]")) safe("characters", clearFilters);
   });
   matchMedia(NARROW_QUERY).addEventListener("change", e => {
     const det = $("#filters");
@@ -1019,12 +1120,13 @@ function renderContinuities() {
 
   const cards = DATA.continuities.map(c => {
     const diffs = DATA.comparisons.filter(cm => cm.positions.length > 1 && cm.positions.some(p => p.continuityId === c.id));
+    const premise = resolve(c, "premise");
     return h("article", { class: "card", id: "cont-" + c.id, tabindex: "-1" },
-      h("h3", { id: "h-cont-" + c.id }, c.name),
-      h("dl", { class: "facts" }, h("dt", {}, "Years"), h("dd", {}, c.years), h("dt", {}, "Main media"), h("dd", {}, c.media)),
-      h("p", {}, c.premise), sourceNote(c.source),
-      h("button", { type: "button", class: "btn", id: "b-cont-" + c.id, "data-details": "cont-" + c.id, "aria-labelledby": "b-cont-" + c.id + " h-cont-" + c.id, "aria-expanded": "false" }, "Details"),
-      h("div", { class: "region", id: "r-cont-" + c.id, hidden: true },
+      h("h3", { id: "h-cont-" + c.id }, contName(c.id)),
+      h("dl", { class: "facts" }, h("dt", {}, "Years"), h("dd", {}, eraOf(c).years), h("dt", {}, "Main media"), h("dd", {}, c.media)),
+      h("p", {}, premise.text), sourceNote(mergeSources(c.source, premise.source)),
+      detailsButton("cont-" + c.id),
+      detailsRegion("cont-" + c.id,
         diffs.length ? h("p", {}, "Differs from the others on:") : h("p", { class: "unknown" }, "No differences recorded."),
         diffs.length ? h("ul", {}, diffs.map(cm => h("li", {}, h("a", { href: "#cmp-" + cm.id }, cm.question)))) : null));
   });
@@ -1036,8 +1138,8 @@ function renderContinuities() {
          h("p", { class: "cmp-lead" }, h("span", { "aria-hidden": "true" }, "≠ "), "Accounts differ. Each is correct within its own continuity."),
          h("ul", { class: "cmp-cols" }, DATA.continuities.map(c => cm.positions.find(p => p.continuityId === c.id)).filter(Boolean).map(p => h("li", {},
            h("p", { class: "cmp-who" }, h("a", { href: "#cont-" + p.continuityId }, "In " + contName(p.continuityId))),
-           p.accounts.flatMap(a => [
-             h("p", {}, a.label ? a.label + ": " : "", a.text), a.source ? sourceNote(a.source) : h("p", { class: "unknown" }, "unknown")]))))))]
+           p.accounts.flatMap(a => { const prose = resolve(a); return [
+             h("p", {}, a.label ? a.label + ": " : "", prose.text), prose.source.length ? sourceNote(prose.source) : h("p", { class: "unknown" }, "unknown")]; }))))))]
     : [h("p", { class: "meta" }, "No differences recorded yet.")];
 
   root.replaceChildren(asList,
@@ -1045,14 +1147,6 @@ function renderContinuities() {
     h("div", { id: "continuity-cards", class: "cards cont-cards", tabindex: "-1" }, cards), ...cmpBlock);
 }
 function initContinuities() {
-  $("#continuities-body").addEventListener("click", e => {
-    const b = e.target.closest("[data-details]");
-    if (!b) return;
-    const id = b.dataset.details, open = b.getAttribute("aria-expanded") !== "true";
-    b.setAttribute("aria-expanded", open ? "true" : "false");
-    b.textContent = open ? "Hide details" : "Details";
-    $("#r-" + id).hidden = !open;
-  });
   matchMedia(NARROW_QUERY).addEventListener("change", e => {
     const list = $("#map-list");
     if (list && e.matches) list.open = true;
@@ -1062,7 +1156,6 @@ function initContinuities() {
 /* ---- 5. Quiz ---- */
 function renderQuestion() {
   const q = DATA.quiz[state.quiz.i];
-  state.quiz.checked = false;
   $("#quiz-q").replaceChildren(h("fieldset", { tabindex: "-1", id: "quiz-fs" },
     h("legend", {}, h("span", { class: "qn" }, "Question " + (state.quiz.i + 1) + " of " + DATA.quiz.length), h("span", { class: "qt" }, q.question)),
     q.options.map((o, i) => h("label", { class: "opt" }, h("input", { type: "radio", name: "q-" + q.id, value: String(i) }), h("span", {}, o), h("span", { class: "mark" })))));
@@ -1077,25 +1170,30 @@ function checkAnswer() {
   const q = DATA.quiz[state.quiz.i], out = $("#quiz-result");
   const chosen = $("#quiz-q input:checked");
   if (!chosen) { out.replaceChildren("Choose an answer, then press Check."); return; }
-  const pick = +chosen.value, right = pick === q.answer;
+  const pick = +chosen.value, right = pick === q.answer, why = resolve(q, "explanation");
   if (!(q.id in state.quiz.firstTry)) state.quiz.firstTry[q.id] = right;
-  state.quiz.checked = true;
   clearMarks();
   const marks = document.querySelectorAll("#quiz-q .mark");
   marks[q.answer].textContent = " (correct answer)";
   if (!right) marks[pick].textContent = " (your answer)";
   else marks[pick].textContent = " (your answer, correct)";
   out.replaceChildren(
-    right ? h("span", { class: "ok" }, "✓ Correct") : h("span", { class: "bad" }, "✗ Not quite"), ". ", q.explanation, " ", sourceNote(q.source));
+    right ? h("span", { class: "ok" }, "✓ Correct") : h("span", { class: "bad" }, "✗ Not quite"), ". ", why.text, " ", sourceNote(why.source));
   $("#quiz-next").hidden = false;
+}
+/* Section titles come from the page's own <h2>s, not from a copy here. */
+function sectionTitle(id) {
+  const heading = document.getElementById(id) && document.getElementById(id).querySelector("h2");
+  if (!heading) throw new Error("Unknown section id: " + id);
+  return heading.textContent;
 }
 function showSummary() {
   const sum = $("#quiz-summary");
   const got = DATA.quiz.filter(q => state.quiz.firstTry[q.id]).length;
   sum.replaceChildren(h("h3", {}, "What you covered"),
-    h("ol", { class: "summary-list" }, DATA.quiz.map(q => h("li", {},
-      h("p", {}, h("strong", {}, q.question)), h("p", {}, "Answer: " + q.options[q.answer]), h("p", {}, q.explanation), sourceNote(q.source),
-      h("p", {}, "Read more: ", h("a", { href: "#" + q.sectionId }, byId([{ id: "timeline", n: "Era timeline" }, { id: "lore", n: "Lore explorer" }, { id: "characters", n: "Character browser" }, { id: "continuities", n: "Continuity map" }], q.sectionId, "section").n), ".")))),
+    h("ol", { class: "summary-list" }, DATA.quiz.map(q => { const why = resolve(q, "explanation"); return h("li", {},
+      h("p", {}, h("strong", {}, q.question)), h("p", {}, "Answer: " + q.options[q.answer]), h("p", {}, why.text), sourceNote(why.source),
+      h("p", {}, "Read more: ", h("a", { href: "#" + q.sectionId }, sectionTitle(q.sectionId)), ".")); })),
     h("p", {}, "You got " + got + " of " + DATA.quiz.length + " on the first try."),
     h("button", { type: "button", class: "btn", id: "quiz-restart" }, "Start again"));
   $("#quiz-q").hidden = true; $("#quiz-actions").hidden = true; $("#quiz-result").replaceChildren();
@@ -1109,6 +1207,7 @@ function initQuiz() {
     if (e.target.type !== "radio") return;
     clearMarks();
     $("#quiz-result").replaceChildren();
+    $("#quiz-next").hidden = true;
   });
   $("#quiz-next").addEventListener("click", () => safe("quiz", () => {
     if (state.quiz.i === DATA.quiz.length - 1) { showSummary(); return; }
@@ -1119,7 +1218,7 @@ function initQuiz() {
   $("#quiz-summary").addEventListener("click", e => {
     if (!e.target.closest("#quiz-restart")) return;
     safe("quiz", () => {
-      state.quiz = { i: 0, firstTry: {}, checked: false };
+      state.quiz = { i: 0, firstTry: {} };
       $("#quiz-summary").hidden = true; $("#quiz-q").hidden = false; $("#quiz-actions").hidden = false;
       renderQuestion();
       $("#quiz-fs").focus();
@@ -1130,10 +1229,13 @@ function initQuiz() {
 /* ---- Theme toggle and footer ---- */
 function initTheme() {
   const btn = $("#theme-toggle");
-  let dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const query = matchMedia("(prefers-color-scheme: dark)");
+  let dark = query.matches, pressed = false;
   const sync = () => { btn.setAttribute("aria-pressed", dark ? "true" : "false"); $("#theme-tick").textContent = dark ? "✓ " : ""; };
   sync();
+  query.addEventListener("change", e => { if (!pressed) { dark = e.matches; sync(); } });  /* follow the OS until the first press */
   btn.addEventListener("click", () => {
+    pressed = true;
     dark = !dark;
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
     sync();
@@ -1143,6 +1245,11 @@ function initTheme() {
 /* ---- Start ---- */
 document.documentElement.classList.add("js");
 $("#footer-note").textContent = DATA.meta.note + " Assembled " + DATA.meta.assembled + ".";
+/* One delegated Details handler for every card, character or continuity. */
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-details]");
+  if (b) safe(b.closest("section").id, () => toggleDetails(b));
+});
 initTheme();
 initRail(); initLore(); initCharacters(); initContinuities(); initQuiz();
 safe("timeline", () => renderTimeline(false));
