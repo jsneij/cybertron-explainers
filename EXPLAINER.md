@@ -29,12 +29,15 @@ nothing outside the permitted set.
   strings, numbers, dates and ids. No functions, no DOM, no markup.
 - Render functions read `DATA` and produce DOM. They hold no content — a fact hard-coded in a render function is a bug.
 - **One source of truth.** A fact is typed once. If two views need it, both read the same field. Derive, never duplicate.
+  A claim shown in several views (timeline entry, lore variant, comparison column) is one record with an `id`; each view
+  references it and may add framing (title, label, link), never a reworded copy. Records sharing an id across collections
+  (an era and a continuity) derive shared fields such as years, never retype them. Reworded copies drift (CYB-11 F3, H1).
 - Entities carry a stable string `id`. Relationships are id references, never nested copies of the entity.
 - **State minimalism.** Store only what the reader chose (selected id, active filter, quiz answer). Counts, filtered
   lists, labels and "is selected" are derived at render time. If you can compute it, do not store it.
 
 **Check:** a non-engineer can correct a date or a name by editing `DATA` alone. Change one fact, reload: every place
-it appears updates — if one doesn't, the fact was typed twice.
+it appears updates — if one doesn't, the fact was typed twice. Read `DATA` top to bottom: no claim is stated in two records.
 
 ## 4. Source discipline
 
@@ -62,18 +65,22 @@ DevTools › Performance, cold `file://` load: interactive under 2 s.
 
 ## 6. Progressive enhancement and failure visibility
 
-- Core content is readable at first paint. With JS broken the reader still gets the prose, plus a `<noscript>` note
-  naming which interactions are unavailable.
+- With JS off or broken the reader still gets the page's frame: `<h1>`, lede, each section's `<h2>` and a one-sentence
+  intro saying what it teaches, plus a per-section note (`<noscript>`, and a visible fallback for JS that loads but breaks)
+  naming what is unavailable. Content lives in `DATA` (§3) and needs JS to render: copying it into static HTML types every
+  fact twice (§3) and pre-rendering needs a build step (§2). Accepted trade-off (CYB-12), not a gap.
 - Semantic elements first: `<main>`, `<section>`, `<h1>`–`<h3>`, `<ol>`/`<ul>`, `<button>`, `<details>`. `aria-*` only
   where semantics run out. A `<div>` with a click handler is a defect.
 - **A broken interaction must look broken.** Render entry points are wrapped so a thrown error renders the §9 error
   state. Never swallow an exception and leave the UI unchanged. No `console.log` in shipped code.
+- The wrapper honours `?fail=<section id>`: it throws inside that section's render, so the error state is testable without
+  editing code. It is a test hook: never mentioned in reader-facing copy.
 - Live regions (`<output>`, `[role=status]`, `[aria-live]`) are in the markup at first render, empty; renders change only their
   text, and one action updates one region. Screen readers often skip a region that arrives filled, or drop one of two.
 - Never gate logic on `transitionend`/`animationend`: under reduced motion (§8) durations are 0 and they never fire.
 
-**Check:** disable JS and reload — the subject is still readable and `<noscript>` explains what is missing. Throw inside a render
-function — the error state appears; the page does not blank or ignore the click. Capture `document.querySelectorAll('output,[role=status],[aria-live]')`
+**Check:** disable JS and reload — the frame is readable and each section's note says what is missing. Load `?fail=<id>` for
+each section — that section shows the error state; the rest of the page still works. Capture `document.querySelectorAll('output,[role=status],[aria-live]')`
 at load; after the §10 "Focus is never lost" walk (no throw) every node is still `isConnected` and the same query returns the same count (none inserted).
 
 ## 7. Review gate
@@ -81,6 +88,8 @@ at load; after the §10 "Focus is never lost" walk (no throw) every node is stil
 Nothing merges without all four: this file followed (or the deviation justified on the ticket), Ratchet's test evidence
 for the changed interactions, Soundwave's findings fixed or accepted in writing on the ticket, and Jazz's approval.
 **Reuse before invention:** check this file and existing explainers before adding a pattern; approved exceptions are written here.
+**Current conventions:** a page is reviewed against this file as it is at review time, not as it was when the build began.
+The §8 block must match byte for byte: `P='/^:root { \/\* tokens:start/,/tokens:end \*\/$/p'; diff <(sed -n "$P" EXPLAINER.md) <(sed -n "$P" explainers/<slug>/index.html)` prints nothing.
 **Accepted residual risk, studio-wide (CYB-23):** nobody verifies what a screen reader *speaks*, including whether and when live-region updates and inserted alerts are announced, and what WebKit/Safari exposes; §10 proves only what Chrome's accessibility tree exposes.
 
 ## 8. Design tokens
