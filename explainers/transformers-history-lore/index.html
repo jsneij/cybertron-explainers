@@ -1042,7 +1042,7 @@ function renderContinuities() {
          h("p", { class: "cmp-lead" }, h("span", { "aria-hidden": "true" }, "≠ "), "Accounts differ. Each is correct within its own continuity."),
          h("ul", { class: "cmp-cols" }, DATA.continuities.map(c => cm.positions.find(p => p.continuityId === c.id)).filter(Boolean).map(p => h("li", {},
            h("p", { class: "cmp-who" }, h("a", { href: "#cont-" + p.continuityId }, "In " + contName(p.continuityId))),
-           p.accounts.map(a => [
+           p.accounts.flatMap(a => [
              h("p", {}, a.label ? a.label + ": " : "", a.text), a.source ? sourceNote(a.source) : h("p", { class: "unknown" }, "unknown")]))))))]
     : [h("p", { class: "meta" }, "No differences recorded yet.")];
 
