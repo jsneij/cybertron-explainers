@@ -167,8 +167,6 @@ dl.facts dd { margin: 0; font-size: var(--text-sm); }
 
 /* Continuity map */
 .map-svg { display: block; inline-size: 560px; max-inline-size: 100%; overflow: visible; margin-block: var(--space-4); }
-/* Named deviation from EXPLAINER.md §9 "never display: none" (approved on CYB-27): below 40rem there is no map, so the Skip map row goes with it. */
-@media (width < 40rem) { .map-svg, .map-tools { display: none; } }
 .map-svg circle { fill: var(--surface); stroke: var(--accent); stroke-width: 2; }
 .map-svg line { stroke: var(--border-strong); stroke-width: 1.5; }
 .map-svg line.dashed { stroke-dasharray: 6 4; }
@@ -178,6 +176,8 @@ dl.facts dd { margin: 0; font-size: var(--text-sm); }
 .map-list { margin-block: 0; padding-inline-start: var(--space-5); }
 .map-list li { margin-block-end: var(--space-2); }
 .map-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-block-start: var(--space-3); }
+/* Named deviation from EXPLAINER.md §9 "never display: none" (approved on CYB-27): below 40rem there is no map, so the Skip map row goes with it. */
+@media (width < 40rem) { .map-svg, .map-tools { display: none; } }
 .cmp-caption { margin-block: var(--space-6) var(--space-3); color: var(--text-2); }
 .comparison { margin-block-end: var(--space-4); }
 .cmp-lead { margin-block: 0 var(--space-3); color: var(--text-2); }
@@ -521,7 +521,7 @@ const DATA = {
     { id: "primes", name: "The Primes", gist: "Optimus Prime leads the Autobots; G1 gives him a successor, Rodimus Prime, and Aligned adds the Thirteen, the original Primes.",
       paragraphs: [
         { claims: ["optimus-role", { text: "His original name, in some continuities, is Orion Pax.", source: { ref: "wp-optimus", loc: "lead" } }] },
-        { claims: ["film86-prime-dies", "optimus-revived"], cmpId: "matrix" },
+        { claims: ["film86-prime-dies", "optimus-revived"] },
         { text: "In Transformers: Prime, Alpha Trion, Optimus's deceased mentor who appears as a vision, is a member of the Thirteen, the original Primes.",
           source: { ref: "wp-prime", loc: "Characters › Miscellaneous" } }
       ],
@@ -580,7 +580,7 @@ const DATA = {
     { id: "rodimus-prime", name: "Rodimus Prime", factions: ["autobot"], eras: ["g1"], roles: ["leader"],
       profileSource: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" },
       firstAppearance: { value: "1986", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
-      description: { claim: "matrix-g1-cartoon" },
+      description: { claims: [{ label: "G1 cartoon, 1986 film", claim: "matrix-g1-cartoon" }] },
       cmpId: "matrix" },
     { id: "galvatron", name: "Galvatron", factions: ["decepticon"], eras: ["g1", "film"], roles: ["antagonist"],
       profileSource: { ref: "wp-megatron", loc: "History" },
@@ -608,7 +608,7 @@ const DATA = {
     { id: "quintessons", name: "The Quintessons", factions: ["neither"], eras: ["g1"], roles: ["creator", "antagonist"],
       profileSource: { ref: "wp-g1", loc: "Premise" },
       firstAppearance: { value: "1986", source: { ref: "wp-g1", loc: "Premise" } },
-      description: { claims: [{ text: "A cruel, coldly logical alien race with five faces and tentacles. The movie established them.", source: { ref: "wp-g1", loc: "Premise" } }, "quintessons-create"] },
+      description: { claims: [{ text: "A cruel, coldly logical alien race with five faces and tentacles. The movie established them.", source: { ref: "wp-g1", loc: "Premise" } }, { label: "G1 cartoon", claim: "quintessons-create" }] },
       cmpId: "origins" }
   ],
 
@@ -710,7 +710,7 @@ const DATA = {
       options: ["The planet's energon is at a dangerous level, so they need organic forms to function without going into stasis lock", "The Quintessons ordered it as a punishment", "Beast forms were always their natural shape"], answer: 0,
       explanation: "The crash-landing planet has a dangerous level of energon, which forces them to take organic beast forms in order to function.",
       sectionId: "timeline", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
-    { id: "q-bee", question: "Which of these characters could not appear in Beast Wars because Hasbro had lost the rights to the name?",
+    { id: "q-bee", question: "According to Wikipedia, which of these characters could not appear in Beast Wars because Hasbro had lost the rights to the name?",
       options: ["Optimus Prime", "Starscream", "Bumblebee"], answer: 2,
       claims: ["bumblebee-bw-rights", "bw-original-optimus", { text: "Starscream also appears in Beast Wars.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }],
       sectionId: "characters" },
