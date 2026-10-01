@@ -352,7 +352,7 @@ const DATA = {
       summary: "Armada, Energon and Cybertron: three series launched from 2002, co-productions between Takara and Hasbro, 52 episodes each.",
       source: { ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" } },
     { id: "idw", name: "IDW comics", years: "2005–2018",
-      summary: "IDW Publishing's Transformers comics, from The Transformers: Infiltration to the Unicron event comic: the longest continuously running Transformers continuity to date.",
+      summary: "IDW Publishing's Transformers comics, from The Transformers: Infiltration to the Unicron event comic: described by Wikipedia's Transformers franchise coverage as long-running; its own article gives no ranking.",
       source: { ref: "wp-idw", loc: "lead" } },
     { id: "film", name: "Live-action films", years: "2007–present",
       summary: "Michael Bay's 2007 film started a live-action film series, distinct from previous incarnations. This era is on the timeline but not on the continuity map.",
@@ -385,7 +385,7 @@ const DATA = {
       loreId: "cybertron", cmpId: "origins",
       source: [{ ref: "wp-g1", loc: "Premise" }, { ref: "wp-anim", loc: "Transformers: Generation 1" }] },
     { id: "primus-uk", eraId: "g1", date: null, title: "Primus appears as creator in the UK Marvel comic",
-      text: "In the UK comic, Primus is introduced as the creator of the Transformers, serving his material body, the planet Cybertron, and fighting his nemesis Unicron.",
+      text: "In the UK comic, Primus is introduced as the creator of the Transformers, who were made to serve his material body, the planet Cybertron, and to fight his nemesis Unicron.",
       more: { text: "The source does not say when in the UK comic's run this happened, so no date is given.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
       loreId: "cybertron", cmpId: "origins",
       source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
@@ -434,9 +434,8 @@ const DATA = {
       text: "The series aired on The Hub. Team Prime fights the Decepticons on Earth; the show sits in the Aligned continuity with related books and video games.",
       loreId: "matrix",
       source: { ref: "wp-prime", loc: "lead and Premise" } },
-    { id: "prime-end", eraId: "aligned", date: { iso: "2013-07-26" }, title: "Prime's last episode airs",
-      text: "A concluding TV film, Predacons Rising, followed. In it Unicron seeks to kill Cybertron's core, which is actually his brother Primus.",
-      more: { text: "The source gives no airdate for Predacons Rising, so none is shown.", source: { ref: "wp-prime", loc: "Synopsis" } },
+    { id: "prime-end", eraId: "aligned", date: { iso: "2013-10-04" }, title: "Prime's series concludes",
+      text: "The series concluded on October 4, 2013 with the TV film Predacons Rising. In it Unicron seeks to kill Cybertron's core, which is actually his brother Primus.",
       loreId: "cybertron", cmpId: "unicron",
       source: { ref: "wp-prime", loc: "lead and Synopsis › Predacons Rising" } }
   ],
@@ -451,20 +450,17 @@ const DATA = {
           cmpId: "origins", source: { ref: "wp-g1", loc: "Premise" } }
       ],
       variants: [
-        { continuityId: "g1", label: "G1, UK Marvel comic", text: "Primus is the creator of the Transformers, and Cybertron is his material body; he fights his nemesis Unicron.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
+        { continuityId: "g1", label: "G1, UK Marvel comic", text: "Primus is the creator of the Transformers, who were made to serve his material body, the planet Cybertron, and to fight his nemesis Unicron.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
         { continuityId: "bw", text: "Beast Machines reveals Cybertron to have organic origins. The Beast Wars franchise also takes from the comics the idea of Cybertron having an organic core.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
         { continuityId: "aligned", text: "In Predacons Rising, Cybertron's core is actually Primus, brother of Unicron.", source: { ref: "wp-prime", loc: "Synopsis › Predacons Rising" } }
       ] },
     { id: "allspark", name: "The AllSpark", gist: "In the 2007 film, a lost artifact that both factions hunt: the source of all Cybertronian life.",
       paragraphs: [
         { text: "In the 2007 live-action film, Cybertron was ravaged by a civil war between the Autobots, led by Optimus Prime, and the Decepticons, led by Megatron. Both search for a lost artifact called the AllSpark, the source of all Cybertronian life.",
-          source: { ref: "wp-film", loc: "Plot" } }
+          source: { ref: "wp-film", loc: "Plot" } },
+        { text: "In production, the film's writers made the Creation Matrix their plot device, though producer Murphy had it renamed.", source: { ref: "wp-film", loc: "Production" } }
       ],
-      note: "This topic covers the film's account only. The films are not one of the five continuities on the map, and this page has not sourced how the AllSpark is treated elsewhere.",
-      variants: [
-        { continuityId: "g1", label: "G1 cartoon", text: "Vector Sigma, introduced in the second season's \"The Key to Vector Sigma\", served the same original purpose as the Creation Matrix: giving life to Transformers.", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
-        { continuityId: "g1", label: "G1, Marvel comic", text: "Optimus Prime wields the Creation Matrix, which gives life to machines.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } }
-      ] },
+      note: "This topic covers the film's account only. The films are not one of the five continuities on the map, and this page has not sourced how the AllSpark is treated elsewhere." },
     { id: "primes", name: "The Primes", gist: "Optimus Prime leads the Autobots; G1 gives him a successor, Rodimus Prime, and Aligned adds the Thirteen, the original Primes.",
       paragraphs: [
         { text: "Optimus Prime is the supreme commander of the Autobots and the franchise's main protagonist, opposing the Decepticon leader Megatron. His original name, in some continuities, is Orion Pax.",
@@ -510,19 +506,19 @@ const DATA = {
   ],
   /* profileSource backs faction, era and role. firstAppearance null renders "unknown". */
   characters: [
-    { id: "optimus-prime", name: "Optimus Prime", factions: ["autobot"], eras: ["g1", "bw", "film", "aligned"], roles: ["leader"],
-      profileSource: [{ ref: "wp-optimus", loc: "lead and History" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000); Live-action film franchise (2007–present)" }, { ref: "wp-prime", loc: "Synopsis" }],
-      firstAppearance: { value: "1984–85", confidence: "approximate", source: { ref: "wp-g1", loc: "History › 1984 and 1985" } },
+    { id: "optimus-prime", name: "Optimus Prime", factions: ["autobot"], eras: ["g1", "bw", "ut", "film", "aligned"], roles: ["leader"],
+      profileSource: [{ ref: "wp-optimus", loc: "lead, History and infobox (voice credits)" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000); Live-action film franchise (2007–present)" }, { ref: "wp-prime", loc: "Synopsis" }],
+      firstAppearance: { value: "1984", source: { ref: "wp-g1", loc: "History › 1984 and 1985" } },
       description: { text: "Supreme commander of the Autobots and the franchise's main protagonist. Killed in the 1986 film and revived in the cartoon's third-season finale.", source: { ref: "wp-optimus", loc: "lead and History" } } },
     { id: "megatron", name: "Megatron", factions: ["decepticon"], eras: ["g1", "film", "aligned"], roles: ["leader", "antagonist"],
       profileSource: [{ ref: "wp-megatron", loc: "lead and History" }, { ref: "wp-prime", loc: "Synopsis" }],
       firstAppearance: { value: "1984", source: { ref: "wp-megatron", loc: "History" } },
       description: { text: "Leader of the Decepticons and Optimus Prime's archenemy. A ruthless dictator in the cartoon, a former gladiator in the Marvel comic. The Beast Wars Megatron is a different character.", source: { ref: "wp-megatron", loc: "History" } } },
-    { id: "starscream", name: "Starscream", factions: ["decepticon"], eras: ["g1", "bw", "aligned"], roles: ["second"],
+    { id: "starscream", name: "Starscream", factions: ["decepticon"], eras: ["g1", "bw", "film", "aligned", "idw"], roles: ["second"],
       profileSource: [{ ref: "wp-starscream", loc: "lead and History" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }, { ref: "wp-prime", loc: "Synopsis" }],
-      firstAppearance: { value: "1984–85", confidence: "approximate", source: { ref: "wp-g1", loc: "History › 1984 and 1985" } },
+      firstAppearance: { value: "1984", source: { ref: "wp-g1", loc: "History › 1984 and 1985" } },
       description: { text: "Second-in-command of the Decepticons, usually a treacherous air commander who seeks to overthrow Megatron. His toy first appeared in a 1983 Diaclone catalog.", source: { ref: "wp-starscream", loc: "lead and History" } } },
-    { id: "bumblebee", name: "Bumblebee", factions: ["autobot"], eras: ["g1", "film"], roles: ["scout"],
+    { id: "bumblebee", name: "Bumblebee", factions: ["autobot"], eras: ["g1", "film", "aligned"], roles: ["scout"],
       profileSource: { ref: "wp-bumblebee", loc: "lead and History" },
       firstAppearance: { value: "1984", source: { ref: "wp-bumblebee", loc: "History" } },
       description: { text: "A small Autobot scout, a yellow Volkswagen Beetle in the original toys and cartoon. He could not appear in Beast Wars because Hasbro had lost the rights to his name.", source: { ref: "wp-bumblebee", loc: "History" } } },
@@ -530,11 +526,11 @@ const DATA = {
       profileSource: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" },
       firstAppearance: { value: "1986", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
       description: { text: "Hot Rod catches the Matrix as Optimus Prime dies in the 1986 film; harnessing it, he becomes Rodimus Prime and destroys Unicron.", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } } },
-    { id: "galvatron", name: "Galvatron", factions: ["decepticon"], eras: ["g1"], roles: ["antagonist"],
+    { id: "galvatron", name: "Galvatron", factions: ["decepticon"], eras: ["g1", "film"], roles: ["antagonist"],
       profileSource: { ref: "wp-megatron", loc: "History" },
       firstAppearance: { value: "1986", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
       description: { text: "In the 1986 film Unicron finds the mortally wounded Megatron and rebuilds him as Galvatron, a puppet of Unicron.", source: { ref: "wp-megatron", loc: "History" } } },
-    { id: "unicron", name: "Unicron", factions: ["neither"], eras: ["g1", "ut", "film", "aligned"], roles: ["antagonist"],
+    { id: "unicron", name: "Unicron", factions: ["neither"], eras: ["g1", "ut", "film", "aligned", "idw"], roles: ["antagonist"],
       profileSource: [{ ref: "wp-unicron", loc: "Fictional character biography" }, { ref: "wp-anim", loc: "Unicron Trilogy" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }],
       firstAppearance: { value: "1986", source: { ref: "wp-unicron", loc: "lead" } },
       description: { text: "An evil god-like being who can transform into a giant mechanical planet. In Prime he is the ancient enemy of Primus, his brother, and his blood, Dark Energon, is a recurring plot element.", source: [{ ref: "wp-unicron", loc: "lead" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }] } },
@@ -565,26 +561,24 @@ const DATA = {
       premise: "Maximals and Predacons crash-land on a planet 300 years after the Great War and take beast forms.",
       source: [{ ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }, { ref: "wp-bw", loc: "Premise" }] },
     { id: "ut", name: "Unicron Trilogy", short: "Unicron", years: "2002–2006", media: "Toy lines and anime series Armada, Energon, Cybertron",
-      premise: "Three connected series in which Unicron plays a major role: from Mini-Cons on Earth to a black hole created by his destruction.",
+      premise: "Three anime series, Armada, Energon and Cybertron, in which Unicron plays a major role: from Mini-Cons on Earth to a black hole created by his destruction. Cybertron was made as a stand-alone reboot.",
       source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] },
     { id: "aligned", name: "Aligned continuity", short: "Aligned", years: "2010–2021", media: "Transformers: Prime, video games, novels, other series",
       premise: "Team Prime fights the Decepticons on Earth; Hasbro meant the continuity to unify its media.",
       source: [{ ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" }, { ref: "wp-prime", loc: "Premise" }] },
     { id: "idw", name: "IDW comics", short: "IDW", years: "2005–2018", media: "IDW Publishing comics",
-      premise: "A contemporary retelling of the G1 idea by writer Simon Furman, kept apart from Beast Wars.",
+      premise: "Launched in 2005 by writer Simon Furman as a contemporary version of G1, kept apart from Beast Wars; later written by many others.",
       source: { ref: "wp-idw", loc: "lead and First era" } }
   ],
 
   /* Edges: relation is 16 characters or fewer. "differs on N" is derived from the comparisons. */
   edges: [
-    { from: "bw", to: "g1", relation: "set after",
+    { from: "bw", to: "g1", relation: "part of",
       source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
     { from: "ut", to: "g1", relation: "reboots",
       source: { ref: "wp-anim", loc: "Unicron Trilogy" } },
     { from: "idw", to: "bw", relation: "set apart from",
-      source: { ref: "wp-idw", loc: "First era" } },
-    { from: "aligned", to: "g1", relation: "meant to unify",
-      source: { ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" } }
+      source: { ref: "wp-idw", loc: "First era" } }
   ],
 
   /* Comparison sets: the contradictions. A continuity with no sourced account is left out, not shown empty. */
@@ -613,16 +607,16 @@ const DATA = {
           { label: "Cartoon", text: "The \"Autobot Matrix of Leadership\": Hot Rod harnesses it, becomes Rodimus Prime and destroys Unicron.", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
           { label: "Marvel comic", text: "Prime wields the Creation Matrix, which gives life to machines.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } } ] },
         { continuityId: "aligned", accounts: [
-          { text: "Optimus uses it to knock Unicron back into hibernation, and to restore his own memories.", source: { ref: "wp-prime", loc: "Synopsis › Season 1 and Season 2" } } ] }
+          { text: "Optimus uses it to knock Unicron back into hibernation, at the expense of his memories, and Jack later uses it to restore Optimus's lost memories.", source: { ref: "wp-prime", loc: "Synopsis › Season 1 and Season 2" } } ] }
       ] },
     { id: "unicron", question: "What is Unicron?",
       positions: [
         { continuityId: "g1", accounts: [
           { text: "In the 1986 film, a Transformer who devours planets and re-creates Megatron as Galvatron. In the UK comic, Primus's nemesis.", source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993); Marvel comics (1984-1995)" }] } ] },
         { continuityId: "ut", accounts: [
-          { text: "The Mini-Cons of Armada are revealed to be his weapons. In Energon the Decepticons and Terrorcons try to resurrect him. In Cybertron his destruction creates a black hole that threatens the universe.", source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] } ] },
+          { text: "The Mini-Cons of Armada are revealed to be his weapons. In Energon the Decepticons and Terrorcons try to resurrect him. At the end of Energon his destruction creates a black hole that threatens the universe.", source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] } ] },
         { continuityId: "aligned", accounts: [
-          { text: "The ancient enemy of the Transformers and their creator Primus, his brother, who unwillingly became the core of Earth. His blood, Dark Energon, is a recurring plot element.", source: { ref: "wp-prime", loc: "Characters › Miscellaneous" } } ] }
+          { text: "The ancient enemy of the Transformers and of their creator Primus, his brother. After his defeat he unwillingly became Earth's core. His blood, Dark Energon, is a recurring plot element.", source: { ref: "wp-prime", loc: "Characters › Miscellaneous" } } ] }
       ] },
     { id: "join", question: "Do these stories join up into one history?",
       positions: [
@@ -647,7 +641,7 @@ const DATA = {
     { id: "q-creators", question: "In the G1 cartoon, who were revealed as the creators of the Autobots and Decepticons?",
       options: ["Primus", "The Quintessons", "Unicron"], answer: 1,
       explanation: "The cartoon's third season revealed the Quintessons as the creators. The UK Marvel comic and Aligned continuity instead name Primus.",
-      sectionId: "continuities", source: { ref: "wp-g1", loc: "Premise" } },
+      sectionId: "continuities", source: [{ ref: "wp-g1", loc: "Premise" }, { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }] },
     { id: "q-beast", question: "In Beast Wars, why do the robots take beast forms?",
       options: ["The planet's energon is at a dangerous level, so they need organic forms to function without going into stasis lock", "The Quintessons ordered it as a punishment", "Beast forms were always their natural shape"], answer: 0,
       explanation: "The crash-landing planet has a dangerous level of energon, which forces them to take organic beast forms in order to function.",
@@ -657,7 +651,7 @@ const DATA = {
       explanation: "Bumblebee was left out for that reason. The original Optimus Prime and Starscream both appear in Beast Wars.",
       sectionId: "characters", source: [{ ref: "wp-bumblebee", loc: "History" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }] },
     { id: "q-matrix", question: "In the Marvel comic, what does the Creation Matrix do?",
-      options: ["It gives life to machines", "It destroys Unicron", "It powers the Ark"], answer: 0,
+      options: ["It gives life to machines", "It turns Autobots into Decepticons", "It powers the Ark"], answer: 0,
       explanation: "The Marvel comic establishes early on that Prime wields the Creation Matrix, which gives life to machines; the cartoon's film calls it the Matrix of Leadership.",
       sectionId: "lore", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } }
   ]
@@ -875,7 +869,7 @@ function initLore() {
 /* ---- 3. Character browser ---- */
 const GROUPS = [
   { key: "faction", legend: "Faction", list: "factions", field: "factions" },
-  { key: "era", legend: "Era", list: "eras", field: "eras" },
+  { key: "era", legend: "Eras (on this page)", list: "eras", field: "eras" },
   { key: "role", legend: "Role", list: "roles", field: "roles" }
 ];
 const MAX_CHIPS = 7;
@@ -946,7 +940,7 @@ function renderCards(announce) {
   const out = $("#char-count"), grid = $("#char-cards");
   if (!shown.length) {
     const why = describeFilters();
-    grid.replaceChildren(h("div", { class: "empty" }, h("p", {}, "No characters match these filters. Try fewer filters."),
+    grid.replaceChildren(h("div", { class: "empty" }, h("p", {}, "No characters on this page match these filters. The roster is a selection, not every Transformer. Try fewer filters."),
       h("button", { type: "button", class: "btn", "data-clear": "" }, "Clear filters")));
     out.textContent = "No characters match " + why;
     return;
