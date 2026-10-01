@@ -1,0 +1,1266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transformers history and lore: an interactive explainer</title>
+<style>
+:root { /* tokens:start */
+  color-scheme: light dark;
+  /* Colour: light-dark(light, dark). Allowed pairs, both schemes: text --text, --text-2, --accent, --ok, --warn, --danger only on --bg, --surface or --surface-2 (≥4.5:1, lowest 5.23); --on-accent only on --accent (6.70/8.96); --focus and --border-strong on --bg, --surface or --surface-2 (≥3:1, lowest 4.34). Any other pair is a defect (--text-2 on --accent is 1.11:1). */
+  --bg: light-dark(#f7f6f2, #131518);        --surface: light-dark(#ffffff, #1c1f24);
+  --surface-2: light-dark(#ecebe5, #272b32); --border: light-dark(#cfccc3, #3d424b);
+  --border-strong: light-dark(#6f6c64, #8a8f99);
+  --text: light-dark(#1c1b19, #edece8);      --text-2: light-dark(#57554f, #b0aea7);
+  --accent: light-dark(#1d4ed8, #8ab4ff);    --on-accent: light-dark(#ffffff, #0b1220);
+  --focus: light-dark(#c2410c, #fdba74);
+  --ok: light-dark(#166f34, #57d38c); --warn: light-dark(#855700, #f5c542); --danger: light-dark(#b42318, #ff8a80);
+  /* Type: system stacks only (§2). Two weights, six sizes. */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --text-xs: 0.8125rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.25rem;
+  --text-xl: clamp(1.5rem, 1.2rem + 1.2vw, 1.875rem); --text-2xl: clamp(1.875rem, 1.4rem + 2vw, 2.5rem);
+  --leading-tight: 1.2; --leading-body: 1.55; --weight-regular: 400; --weight-bold: 650;
+  /* Space (4px base), target size, radii, shadows, motion */
+  --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem;
+  --space-5: 1.5rem; --space-6: 2rem; --space-7: 3rem; --space-8: 4rem; --measure: 68ch; --target: 2.75rem;
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 14px; --radius-full: 999px; --dur-fast: 120ms; --dur-base: 200ms; --dur-slow: 320ms;
+  --shadow-1: 0 1px 2px light-dark(rgb(0 0 0 / .08), rgb(0 0 0 / .5)); --shadow-2: 0 4px 14px light-dark(rgb(0 0 0 / .10), rgb(0 0 0 / .6));
+  --ease-out: cubic-bezier(.2, .7, .2, 1); --ease-in-out: cubic-bezier(.45, 0, .2, 1);
+}
+:root[data-theme="light"] { color-scheme: light; } :root[data-theme="dark"] { color-scheme: dark; }
+@media (prefers-reduced-motion: reduce) { :root { --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; } }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: var(--weight-regular) var(--text-md) / var(--leading-body) var(--font-sans); }
+h1, h2, h3 { line-height: var(--leading-tight); font-weight: var(--weight-bold); text-wrap: balance; }
+h1 { font-size: var(--text-2xl); } h2 { font-size: var(--text-xl); } h3 { font-size: var(--text-lg); }
+p, li, dd { max-width: var(--measure); overflow-wrap: break-word; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; }  /* long error lines must wrap at 390px, not overflow */
+fieldset { min-inline-size: 0; } img, svg, video { max-inline-size: 100%; block-size: auto; }  @media (forced-colors: active) { svg circle, svg line { stroke: CanvasText !important; } svg circle { fill: Canvas !important; } svg text { fill: CanvasText !important; } }
+button, input, select, textarea { font: inherit; }  button, summary, label:has(input) { min-block-size: var(--target); min-inline-size: var(--target); }  label:has(input) { display: flex; align-items: center; gap: var(--space-2); }  a { color: var(--accent); text-underline-offset: .15em; }
+:focus-visible { outline: 3px solid; outline-color: var(--focus); outline-offset: 2px; box-shadow: 0 0 0 2px var(--bg); } /* tokens:end */
+
+/* ---- Layout (one breakpoint: 40rem) ---- */
+.wrap { max-inline-size: 72rem; margin-inline: auto; padding-inline: var(--space-5); }
+@media (width < 40rem) { .wrap { padding-inline: var(--space-4); } }
+.skip { position: absolute; inset-block-start: 0; inset-inline-start: var(--space-2); transform: translateY(-300%);
+  padding: var(--space-2) var(--space-4); background: var(--surface); border: 1px solid; border-color: var(--border-strong); border-radius: var(--radius-md); z-index: 1; }
+.skip:focus { transform: none; }
+header.wrap { padding-block-start: var(--space-6); }
+header p.lede { color: var(--text-2); max-inline-size: var(--measure); }
+.header-row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.header-row nav { flex: 1 1 30rem; }
+nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+nav a { display: flex; align-items: center; min-block-size: var(--target); padding-inline: var(--space-3); }
+main section { margin-block-start: var(--space-8); }
+@media (width < 40rem) { main section { margin-block-start: var(--space-7); } }
+main section > h2 { margin-block: 0 var(--space-3); }
+.intro { color: var(--text-2); max-inline-size: var(--measure); margin-block: 0 var(--space-5); }
+.js-only { display: none; }
+html.js .js-only { display: block; }
+html.js .nojs { display: none; }
+.nojs { color: var(--text-2); font-style: italic; }
+footer.wrap { margin-block: var(--space-8) var(--space-7); color: var(--text-2); font-size: var(--text-sm); }
+footer p { margin-block: var(--space-2); }
+main:focus, h2:focus { outline-offset: 2px; }
+
+/* ---- Components ---- */
+.card, .entry-body, .topic, .comparison, .filters fieldset, .opt, details.disc, .quiz fieldset { background: var(--surface); border: 1px solid; border-color: var(--border);
+  border-radius: var(--radius-md); padding: var(--space-4); }
+.card { box-shadow: var(--shadow-1); transition: background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+.card:hover { box-shadow: var(--shadow-2); }
+.card h3, .comparison h3 { margin: 0 0 var(--space-3); }
+.meta, .years, .source-note, .era-divider, .rule { color: var(--text-2); }
+.source-note { font-size: var(--text-xs); margin-block: var(--space-1) 0; max-inline-size: var(--measure); }
+ol.source-note { padding-inline-start: var(--space-5); }
+.source-note a { color: var(--accent); }
+.source-note a:hover, a:hover { text-decoration-thickness: 2px; }
+.unknown { font-style: italic; color: var(--text-2); }
+.tag { display: inline-block; font-size: var(--text-xs); color: var(--text-2); border: 1px solid; border-color: var(--border-strong);
+  border-radius: var(--radius-full); padding: 0 var(--space-2); margin-inline-start: var(--space-1); white-space: nowrap; }
+sup.src-ref { font-size: var(--text-xs); color: var(--text-2); }
+
+button { color: var(--text); }
+.btn, .chip { background: var(--surface); border: 1px solid; border-color: var(--border-strong); cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+.btn { border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); font-weight: var(--weight-bold); min-inline-size: var(--target); }
+.btn:hover, .chip:hover, summary:hover { background-color: var(--surface-2); }
+.btn:active, .chip:active { background-color: var(--surface-2); border-color: var(--text); }
+.btn.primary { background-color: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.primary:hover { box-shadow: var(--shadow-2); }
+.btn.primary:active { box-shadow: none; }
+.btn[aria-pressed="true"] { border-color: var(--text); }
+.chip { border-radius: var(--radius-full); padding: var(--space-1) var(--space-3); font-size: var(--text-sm); min-inline-size: var(--target); }
+.chip[aria-pressed="true"] { background-color: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.chip[aria-pressed="true"]:hover { box-shadow: var(--shadow-1); }
+
+summary { cursor: pointer; display: flex; align-items: center; gap: var(--space-2); list-style: none;
+  transition: background-color var(--dur-fast) var(--ease-out); }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "\25B8" / ""; flex: none; }
+details[open] > summary::before { content: "\25BE" / ""; }
+details > summary + * { margin-block-start: var(--space-3); }
+details.disc { padding-block: 0; }
+.topic { padding: 0 var(--space-4); }
+.topic > summary { padding-block: var(--space-3); }
+.topic-body { padding-block-end: var(--space-4); }
+.topic h3 { margin: 0; }
+.gist { margin: var(--space-1) 0 0; color: var(--text-2); }
+.topic + .topic, .topics > * + * { margin-block-start: var(--space-4); }
+.topic-body p { margin-block: 0 var(--space-1); }
+.topic-body .source-note { margin-block-end: var(--space-3); }
+.topic details.disc { margin-block-start: var(--space-3); }
+.variants { list-style: none; padding: 0; margin: 0; }
+.variants li { margin-block-end: var(--space-3); }
+.scope { color: var(--text-2); font-size: var(--text-sm); }
+.lore-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; margin-block-end: var(--space-4); }
+
+/* Era rail + timeline */
+.era-rail { border: 0; padding: 0; margin: 0 0 var(--space-3); }
+.era-rail legend { font-weight: var(--weight-bold); padding: 0; margin-block-end: var(--space-2); }
+.era-rail .options { display: flex; flex-wrap: wrap; gap: var(--space-2); border-block-start: 2px solid; border-color: var(--border); padding-block-start: var(--space-2); }
+.era-rail label { display: flex; align-items: center; gap: var(--space-2); padding-inline: var(--space-3); }
+.era-rail label:has(input:checked) { font-weight: var(--weight-bold); }
+.era-rail input, .opt input { inline-size: 1.25rem; block-size: 1.25rem; accent-color: var(--accent); margin: 0; }
+.years { font-size: var(--text-xs); font-weight: var(--weight-regular); }
+@media (width < 40rem) { .era-rail .options { flex-direction: column; } .era-rail label { inline-size: 100%; } }
+output { display: block; min-block-size: 1.5rem; }
+.era-summary { margin-block: var(--space-3) var(--space-5); }
+.era-summary p { margin-block: 0 var(--space-1); }
+ol.timeline { list-style: none; margin: var(--space-4) 0 0; padding: 0 0 0 var(--space-5); border-inline-start: 2px solid; border-color: var(--border); }
+.timeline > li { position: relative; display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: var(--space-4); margin-block-end: var(--space-4); max-inline-size: none; }
+.timeline > li.entry::before { content: ""; position: absolute; inset-inline-start: calc(-1 * var(--space-5) - 7px); inset-block-start: var(--space-1);
+  inline-size: 12px; block-size: 12px; border-radius: var(--radius-full); background: var(--accent); }
+.timeline > li.era-divider { display: block; font-size: var(--text-sm); font-weight: var(--weight-bold); margin-block-start: var(--space-5); }
+.timeline > li.era-divider:first-child { margin-block-start: 0; }
+@media (width < 40rem) { .timeline > li { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); } }
+.date { font-size: var(--text-sm); color: var(--text-2); }
+.entry-body h3 { margin: 0 0 var(--space-2); }
+.entry-body p { margin-block: 0 var(--space-1); }
+.entry-body details { margin-block-start: var(--space-3); }
+.entry-body details summary { min-block-size: var(--target); }
+
+/* Characters */
+.filters > summary { padding-inline: var(--space-3); font-weight: var(--weight-bold); }
+.filter-groups { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+@media (width < 40rem) { .filter-groups { grid-template-columns: minmax(0, 1fr); } }
+@media (width >= 40rem) { .filters > summary { display: none; } }
+.filters fieldset { margin: 0; }
+.filters legend { font-weight: var(--weight-bold); padding-inline: var(--space-1); }
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.more { margin-block-start: var(--space-2); }
+.more summary { padding-inline: var(--space-2); font-size: var(--text-sm); }
+.rule { font-size: var(--text-xs); margin-block: var(--space-3) 0; }
+.count-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-block: var(--space-4); }
+.count-row output { flex: 1 1 14rem; display: block; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: var(--space-4); }
+.cont-cards { grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); }
+dl.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-1) var(--space-3); margin: 0 0 var(--space-3); }
+dl.facts dt { color: var(--text-2); font-size: var(--text-xs); padding-block-start: var(--space-1); }
+dl.facts dd { margin: 0; font-size: var(--text-sm); }
+.card .region { margin-block-start: var(--space-3); }
+.card .region p { margin-block: 0; }
+.card .btn { margin-block-start: var(--space-2); }
+.empty { border: 1px dashed; border-color: var(--border-strong); padding: var(--space-6); text-align: center; color: var(--text-2); border-radius: var(--radius-md); grid-column: 1 / -1; }
+.empty p { margin: 0 auto var(--space-3); }
+
+/* Continuity map */
+.map-svg { display: block; inline-size: 560px; max-inline-size: 100%; overflow: visible; margin-block: var(--space-4); }
+.map-svg circle { fill: var(--surface); stroke: var(--accent); stroke-width: 2; }
+.map-svg line { stroke: var(--border-strong); stroke-width: 1.5; }
+.map-svg line.dashed { stroke-dasharray: 6 4; }
+.map-svg text { fill: var(--text); font-size: var(--text-sm); font-family: var(--font-sans); text-anchor: middle; }
+.map-svg text.edge { fill: var(--text-2); font-size: var(--text-xs); stroke: var(--bg); stroke-width: 3; paint-order: stroke; }
+.map-svg a { cursor: pointer; }
+.map-list { margin-block: 0; padding-inline-start: var(--space-5); }
+.map-list li { margin-block-end: var(--space-2); }
+.map-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-block-start: var(--space-3); }
+/* Named deviation from EXPLAINER.md §9 "never display: none" (approved on CYB-27): below 40rem there is no map, so the Skip map row goes with it. */
+@media (width < 40rem) { .map-svg, .map-tools { display: none; } }
+.cmp-caption { margin-block: var(--space-6) var(--space-3); color: var(--text-2); }
+.comparison { margin-block-end: var(--space-4); }
+.cmp-lead { margin-block: 0 var(--space-3); color: var(--text-2); }
+.cmp-cols { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--space-3); }
+.cmp-cols > li { background: var(--surface); border: 1px solid; border-color: var(--border); border-radius: var(--radius-md); padding: var(--space-4); max-inline-size: none; }
+.cmp-cols p { margin-block: 0 var(--space-2); }
+.cmp-who { font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--text-2); }
+.cmp-cols .source-note { margin-block-end: var(--space-3); }
+h3 > a.plain { color: inherit; }
+
+/* Quiz */
+.quiz { max-inline-size: var(--measure); }
+.quiz fieldset { margin: 0 0 var(--space-3); min-inline-size: 0; }
+.quiz legend { padding-inline: var(--space-1); }
+.quiz legend .qn { display: block; font-size: var(--text-xs); color: var(--text-2); }
+.quiz legend .qt { display: block; font-weight: var(--weight-bold); }
+.opt { display: flex; align-items: center; gap: var(--space-3); margin-block-end: var(--space-2); padding-block: var(--space-2); }
+.opt .mark { color: var(--text-2); font-size: var(--text-sm); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.result { margin-block-start: var(--space-3); }
+.ok { color: var(--ok); font-weight: var(--weight-bold); }
+.bad { color: var(--danger); font-weight: var(--weight-bold); }
+.summary-list { padding-inline-start: var(--space-5); }
+.summary-list li { margin-block-end: var(--space-4); }
+.summary-list p { margin-block: 0 var(--space-1); }
+.quiz [hidden] { display: none; }
+
+/* Error state */
+.error { border: 2px solid; border-color: var(--danger); background: var(--surface-2); border-radius: var(--radius-md); padding: var(--space-4); }
+.error p { margin-block: 0 var(--space-2); }
+.error .error-title { font-weight: var(--weight-bold); }
+pre { background: var(--surface-2); border-radius: var(--radius-sm); padding: var(--space-3); font-family: var(--font-mono); font-size: var(--text-xs); margin: 0; }
+.error pre { background: var(--surface); }
+</style>
+<noscript><style>.nojs { display: none; }</style></noscript>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="wrap">
+  <h1>Transformers history and lore</h1>
+  <p class="lede">A guided tour of the franchise's eras, its lore, its characters and the places where its continuities contradict each other.</p>
+  <div class="header-row">
+    <nav aria-label="On this page">
+      <ul>
+        <li><a href="#timeline">Timeline</a></li>
+        <li><a href="#lore">Lore</a></li>
+        <li><a href="#characters">Characters</a></li>
+        <li><a href="#continuities">Continuities</a></li>
+        <li><a href="#quiz">Quiz</a></li>
+      </ul>
+    </nav>
+    <button type="button" class="btn js-only" id="theme-toggle" aria-pressed="false"><span aria-hidden="true" id="theme-tick"></span>Dark theme</button>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+  <section id="timeline">
+    <h2 tabindex="-1">Era timeline</h2>
+    <p class="intro" id="timeline-intro">The franchise in order, one era at a time. Choose an era to see only its entries.</p>
+    <p class="nojs">Choosing an era needs JavaScript. Without it, the timeline cannot be shown.</p>
+    <noscript><p>Era selection and the timeline need JavaScript, which is off or blocked in this browser.</p></noscript>
+    <div id="timeline-body" class="js-only">
+      <fieldset class="era-rail" id="era-rail"><legend>Era</legend><div class="options" id="era-options"></div></fieldset>
+      <output id="era-count" aria-live="polite"></output>
+      <div class="era-summary" id="era-summary"></div>
+      <ol class="timeline" id="era-list"></ol>
+      <div id="era-empty"></div>
+    </div>
+  </section>
+
+  <section id="lore">
+    <h2 tabindex="-1">Lore explorer</h2>
+    <p class="intro">Everything in this section is in-story. Accounts differ between continuities; where they do, the entry says so.</p>
+    <p class="nojs">The lore topics need JavaScript.</p>
+    <noscript><p>The lore topics need JavaScript, which is off or blocked in this browser.</p></noscript>
+    <div id="lore-body" class="js-only">
+      <div class="lore-tools"><button type="button" class="btn" id="lore-all">Open all topics</button></div>
+      <div id="lore-list" class="topics"></div>
+    </div>
+  </section>
+
+  <section id="characters">
+    <h2 tabindex="-1">Character browser</h2>
+    <p class="intro">A selection of characters, not a full roster. Filter by faction, era and role.</p>
+    <p class="nojs">Filtering and the character cards need JavaScript.</p>
+    <noscript><p>Filtering and the character cards need JavaScript, which is off or blocked in this browser.</p></noscript>
+    <div id="characters-body" class="js-only">
+      <div id="char-filters"></div>
+      <div class="count-row">
+        <output id="char-count" aria-live="polite"></output>
+        <button type="button" class="btn" id="char-clear">Clear filters</button>
+      </div>
+      <div id="char-cards" class="cards"></div>
+    </div>
+  </section>
+
+  <section id="continuities">
+    <h2 tabindex="-1">Continuity map</h2>
+    <p class="intro">Transformers is not one story. Each continuity below is its own telling, and they disagree. The disagreements are the point.</p>
+    <p class="nojs">The continuity map and comparisons need JavaScript.</p>
+    <noscript><p>The continuity map and comparisons need JavaScript, which is off or blocked in this browser.</p></noscript>
+    <div id="continuities-body" class="js-only"></div>
+  </section>
+
+  <section id="quiz">
+    <h2 tabindex="-1">Short quiz</h2>
+    <p class="intro">Five questions to check what stuck. There is no timer and no grade; each answer is explained.</p>
+    <p class="nojs">The quiz needs JavaScript.</p>
+    <noscript><p>The quiz needs JavaScript, which is off or blocked in this browser.</p></noscript>
+    <div id="quiz-body" class="js-only">
+      <form class="quiz" id="quiz-form" tabindex="-1" novalidate>
+        <div id="quiz-q"></div>
+        <div class="actions" id="quiz-actions">
+          <button type="submit" class="btn primary" id="quiz-check">Check</button>
+          <button type="button" class="btn" id="quiz-next" hidden>Next question</button>
+        </div>
+        <output class="result" id="quiz-result" aria-live="polite"></output>
+        <div id="quiz-summary" hidden></div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p id="footer-note"></p>
+</footer>
+
+<script>
+"use strict";
+/* =====================================================================
+   DATA: every fact on this page lives here, with its source beside it.
+   A source is { ref, loc } where ref names an entry in DATA.sources.
+   null means unknown and renders as "unknown". Nothing here is a guess.
+   Dates are exactly as precise as their source: "1984" stays "1984".
+   A claim that more than one view shows is typed once, in DATA.claims. A record points at it with
+   claim: "<id>", or claims: [...] when it combines several. An item in claims is either a claim id or,
+   for a sentence only that record uses, an inline { text, source }. A record that has claims has no
+   text of its own. Views add framing (title, date, label, links), never a reworded copy.
+   ===================================================================== */
+const DATA = {
+  meta: {
+    assembled: "2026-10-01",
+    note: "Every claim below traces to the text of the Wikipedia articles listed in sources, read on the assembly date. No primary source (the shows, comics or toy packaging) was consulted directly, and Wikipedia is a secondary source that can itself be wrong or change. Where those articles disagree with each other, both versions are shown."
+  },
+  sources: {
+    "wp-franchise": { title: "Wikipedia: Transformers (franchise)", url: "https://en.wikipedia.org/wiki/Transformers_(franchise)" },
+    "wp-g1": { title: "Wikipedia: Transformers: Generation 1", url: "https://en.wikipedia.org/wiki/Transformers:_Generation_1" },
+    "wp-optimus": { title: "Wikipedia: Optimus Prime", url: "https://en.wikipedia.org/wiki/Optimus_Prime" },
+    "wp-megatron": { title: "Wikipedia: Megatron", url: "https://en.wikipedia.org/wiki/Megatron" },
+    "wp-starscream": { title: "Wikipedia: Starscream", url: "https://en.wikipedia.org/wiki/Starscream" },
+    "wp-bumblebee": { title: "Wikipedia: Bumblebee (Transformers)", url: "https://en.wikipedia.org/wiki/Bumblebee_(Transformers)" },
+    "wp-unicron": { title: "Wikipedia: Unicron", url: "https://en.wikipedia.org/wiki/Unicron" },
+    "wp-idw": { title: "Wikipedia: Transformers (IDW Publishing)", url: "https://en.wikipedia.org/wiki/Transformers_(IDW_Publishing)" },
+    "wp-bw": { title: "Wikipedia: Beast Wars: Transformers", url: "https://en.wikipedia.org/wiki/Beast_Wars:_Transformers" },
+    "wp-prime": { title: "Wikipedia: Transformers: Prime", url: "https://en.wikipedia.org/wiki/Transformers:_Prime" },
+    "wp-armada": { title: "Wikipedia: Transformers: Armada", url: "https://en.wikipedia.org/wiki/Transformers:_Armada" },
+    "wp-film": { title: "Wikipedia: Transformers (film)", url: "https://en.wikipedia.org/wiki/Transformers_(film)" },
+    "wp-anim": { title: "Wikipedia: List of Transformers animated series", url: "https://en.wikipedia.org/wiki/List_of_Transformers_animated_series" }
+  },
+
+  /* Claims shown by more than one view. Change a sentence here and every view that points at it follows.
+     Where the copies were worded differently, the wording the comparison view carried (already checked) is kept. */
+  claims: {
+    "toys-1984": { text: "The franchise began in 1984 with a toy line made of Takara's Diaclone and Micro Change robots, rebranded for Western markets.",
+      source: { ref: "wp-franchise", loc: "lead and Generation 1 (1984–1993)" } },
+
+    "g1-cybertron-war": { text: "In the G1 cartoon's premise, the Autobots and Decepticons have waged civil war on Cybertron for eons. The planet is decimated and both factions scavenge for energon.",
+      source: { ref: "wp-g1", loc: "Premise" } },
+    "g1-ark": { text: "The Autobots leave in a spaceship, the Decepticons follow, and the ship crashes on prehistoric Earth.",
+      source: { ref: "wp-g1", loc: "Premise" } },
+    "quintessons-create": { text: "The Quintessons are the creators of the Autobots and Decepticons, revealed in the third season; they also created the factory that would become Cybertron.",
+      source: { ref: "wp-g1", loc: "Premise" } },
+    "primus-uk-creator": { text: "Primus is the creator of the Transformers; Cybertron is his material body.",
+      source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
+    "bm-organic": { text: "In Beast Machines, Cybertron is revealed to have organic origins.",
+      source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
+    "prime-primus-core": { text: "Primus is the creator of the Transformers and Unicron's brother; Cybertron's core is Primus.",
+      source: { ref: "wp-prime", loc: "Characters › Miscellaneous; Synopsis › Predacons Rising" } },
+
+    "film86-prime-dies": { text: "In The Transformers: The Movie, the mortally wounded Prime gives the Matrix to Ultra Magnus, then drops it as he dies.",
+      source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-optimus", loc: "History" }] },
+    "matrix-g1-cartoon": { text: "The \"Autobot Matrix of Leadership\": Hot Rod harnesses it, becomes Rodimus Prime and destroys Unicron.",
+      source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
+    "optimus-revived": { text: "Prime is revived in the final episode of the cartoon's third season.",
+      source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-optimus", loc: "History" }] },
+    "optimus-role": { text: "Optimus Prime is the supreme commander of the Autobots and the franchise's main protagonist, opposing the Decepticon leader Megatron.",
+      source: { ref: "wp-optimus", loc: "lead" } },
+    "matrix-marvel": { text: "Prime wields the Creation Matrix, which gives life to machines.",
+      source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
+    "matrix-aligned": { text: "Optimus uses it to knock Unicron back into hibernation, at the expense of his memories, and Jack later uses it to restore Optimus's lost memories.",
+      source: { ref: "wp-prime", loc: "Synopsis › Season 1 and Season 2" } },
+
+    "megatron-gladiator": { text: "A former gladiator on Cybertron who gave rise to the Decepticons and started the civil war.",
+      source: { ref: "wp-megatron", loc: "History" } },
+    "megatron-bw": { text: "A different character who named himself after his predecessor, leads the Predacons and transforms into a Tyrannosaurus.",
+      source: { ref: "wp-megatron", loc: "History" } },
+    "bw-descend": { text: "The Maximals are the descendants of the Autobots and the Predacons are the descendants of the Decepticons.",
+      source: { ref: "wp-bw", loc: "Premise" } },
+    "bw-crash": { text: "Maximals and Predacons, from 300 years after the Great War, crash-land on prehistoric Earth and take beast forms.",
+      source: [{ ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }, { ref: "wp-bw", loc: "lead and Premise" }] },
+    "bw-original-optimus": { text: "Beast Wars features the original Optimus Prime.",
+      source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
+
+    "idw-furman": { text: "Writer Simon Furman left out the Ark crash storyline, separating the fictional universe from the Beast Wars one.",
+      source: { ref: "wp-idw", loc: "First era" } },
+    "cybertron-reboot": { text: "Cybertron was meant by its Japanese producers as another complete reboot, with no ties to Armada or Energon.",
+      source: { ref: "wp-anim", loc: "Unicron Trilogy" } },
+    "cybertron-hasbro": { text: "When Hasbro released it in its own markets in mid-2005 it modified the show to establish its place in continuity.",
+      source: { ref: "wp-anim", loc: "Unicron Trilogy" } },
+    "ut-minicons": { text: "The Mini-Cons of Armada are revealed by the end to be weapons of Unicron.",
+      source: [{ ref: "wp-armada", loc: "Production and release" }, { ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] },
+    "ut-blackhole": { text: "At the end of Energon his destruction creates a black hole that threatens the universe.",
+      source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] },
+
+    "aligned-unify": { text: "Created to unify every Transformers medium into one continuity, yet its video games, novels and TV series ended up contradicting each other.",
+      source: { ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" } },
+    "aligned-team": { text: "Team Prime fights the Decepticons on Earth.",
+      source: [{ ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" }, { ref: "wp-prime", loc: "lead and Premise" }] },
+    "unicron-aligned": { text: "The ancient enemy of the Transformers and of their creator Primus, his brother. After his defeat he unwillingly became Earth's core. His blood, Dark Energon, is a recurring plot element.",
+      source: { ref: "wp-prime", loc: "Characters › Miscellaneous" } },
+
+    "bumblebee-bw-rights": { text: "Wikipedia says Bumblebee could not appear in Beast Wars because Hasbro had lost the rights to his name, but it rests that on a single CBR article (\"Transformers: Every Version of Bumblebee, Explained\").",
+      source: { ref: "wp-bumblebee", loc: "History" } },
+    "allspark-hunt": { text: "Both factions hunt a lost artifact called the AllSpark, the source of all Cybertronian life.",
+      source: { ref: "wp-film", loc: "lead and Plot" } }
+  },
+
+  /* Eras, in order of start year. Overlaps are real: IDW began while the Unicron Trilogy was running.
+     summary is the era's own text; claims replaces it where the sentence is shared. source backs name, years and summary. */
+  eras: [
+    { id: "g1", name: "Generation 1", years: "1984–1993",
+      summary: "The original toy line with its Marvel comic and animated series. Wikipedia's franchise article dates Generation 1 characters to 1984–1993; its Generation 1 article dates the toy line itself to 1984–1990.",
+      source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-g1", loc: "lead" }] },
+    { id: "bw", name: "Beast era", years: "1996–2000",
+      claims: [{ text: "A reboot after weak sales of the Generation 2 line, in Beast Wars and Beast Machines.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }, "bw-crash"],
+      source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
+    { id: "ut", name: "Unicron Trilogy", years: "2002–2006",
+      summary: "Armada, Energon and Cybertron: three series launched from 2002, co-productions between Takara and Hasbro, 52 episodes each.",
+      source: { ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" } },
+    { id: "idw", name: "IDW comics", years: "2005–2018",
+      summary: "IDW Publishing's Transformers comics, from The Transformers: Infiltration to the Unicron event comic: the longest continuously running Transformers continuity to date.",
+      source: { ref: "wp-idw", loc: "lead" } },
+    { id: "film", name: "Live-action films", years: "2007–present",
+      summary: "Michael Bay's 2007 film started a live-action film series, distinct from previous incarnations. This era is on the timeline but not on the continuity map.",
+      source: { ref: "wp-franchise", loc: "Live-action film franchise (2007–present)" } },
+    { id: "aligned", name: "Aligned continuity", years: "2010–2021",
+      claims: ["aligned-unify", { text: "The name \"Aligned\" was adopted by fans after Hasbro referred to an \"Aligned Continuity\"; it is not an official name.", source: { ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" } }],
+      source: { ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" } }
+  ],
+
+  /* Timeline entries. date.iso is exactly as precise as the source; date null renders "date unknown". */
+  entries: [
+    { id: "toys-1984", eraId: "g1", date: { iso: "1984" }, title: "Hasbro rebrands Takara's robots as Transformers",
+      claim: "toys-1984",
+      more: { text: "Marvel Comics was hired to create the backstory. Jim Shooter wrote an overall story, Dennis O'Neil created the name \"Optimus Prime\", and Bob Budiansky was chosen to create the characters.",
+        source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } } },
+    { id: "cartoon-1984", eraId: "g1", date: { iso: "1984", confidence: "approximate" }, title: "The cartoon and Marvel comic arrive with the toys",
+      text: "The animated series, made by Sunbow Productions and Marvel Productions, began around the same time as the toys.",
+      loreId: "split",
+      source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993); Marvel comics (1984-1995)" } },
+    { id: "movie-1986", eraId: "g1", date: { iso: "1986" }, title: "The Transformers: The Movie",
+      claims: ["film86-prime-dies", "matrix-g1-cartoon"],
+      more: { text: "Unicron re-creates a heavily damaged Megatron as Galvatron. Optimus Prime's death was meant to make way for a new wave of toys, and the film faced significant backlash for it.",
+        source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-optimus", loc: "History" }] },
+      loreId: "matrix" },
+    { id: "quintessons-1986", eraId: "g1", date: { iso: "1986", confidence: "approximate" }, title: "The Quintessons are revealed as the Transformers' creators",
+      claims: [{ text: "The cartoon's third season, which began in 1986, brought the five-faced Quintessons to prominence.",
+          source: [{ ref: "wp-g1", loc: "Premise" }, { ref: "wp-anim", loc: "Transformers: Generation 1" }] }, "quintessons-create"],
+      more: { text: "The date is approximate because the sources place the reveal \"in the third season\" without saying which year it aired.", source: { ref: "wp-g1", loc: "Premise" } },
+      loreId: "cybertron", cmpId: "origins" },
+    { id: "primus-uk", eraId: "g1", date: null, title: "Primus appears as creator in the UK Marvel comic",
+      claim: "primus-uk-creator",
+      more: { text: "The source does not say when in the UK comic's run this happened, so no date is given.", source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
+      loreId: "cybertron", cmpId: "origins" },
+    { id: "marvel-end", eraId: "g1", date: { iso: "1991" }, title: "The U.S. Marvel comic ends",
+      text: "The U.S. comic lasted 80 issues, until 1991.",
+      source: { ref: "wp-franchise", loc: "Marvel comics (1984-1995)" } },
+
+    { id: "bw-debut", eraId: "bw", date: { iso: "1996-09-16" }, title: "Beast Wars: Transformers debuts",
+      claims: [{ text: "The series is produced by Mainframe Entertainment of Vancouver.", source: { ref: "wp-bw", loc: "lead and Premise" } }, "bw-crash", "bw-descend"],
+      more: { text: "It is described as one of the earliest fully CGI television shows.", source: { ref: "wp-bw", loc: "lead and Premise" } },
+      loreId: "split", cmpId: "join" },
+    { id: "bw-machines", eraId: "bw", date: null, title: "Beast Machines: Cybertron has organic origins",
+      claims: ["bm-organic", { text: "Megatron attempts to stamp out the organic origins.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }],
+      more: { text: "The sources dated give the Beast era as 1996–2000 but no airdate for this reveal, so no date is given.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
+      loreId: "cybertron", cmpId: "origins" },
+    { id: "bw-end", eraId: "bw", date: { iso: "1999-05-07" }, title: "Beast Wars ends",
+      text: "The series concluded on this date, having debuted in 1996.",
+      source: { ref: "wp-bw", loc: "lead" } },
+
+    { id: "armada", eraId: "ut", date: { iso: "2002-08-23" }, title: "Transformers: Armada premieres",
+      claims: [{ text: "The series premiered on Cartoon Network, in the Toonami block.", source: { ref: "wp-armada", loc: "Production and release" } },
+        { text: "Autobots and Decepticons discover the powerful Mini-Cons on Earth.", source: [{ ref: "wp-armada", loc: "Production and release" }, { ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }] },
+        "ut-minicons"],
+      cmpId: "unicron" },
+    { id: "cybertron-jp", eraId: "ut", date: { iso: "2005-01" }, title: "Cybertron debuts in Japan as Galaxy Force",
+      claims: ["cybertron-reboot", "cybertron-hasbro"],
+      cmpId: "join" },
+
+    { id: "idw-start", eraId: "idw", date: { iso: "2005-10" }, title: "IDW's Transformers comics begin",
+      claims: [{ text: "After Dreamwave Productions shut down, IDW won the licence.", source: { ref: "wp-idw", loc: "lead and First era" } }, "idw-furman"],
+      more: { text: "Issue #0 was planned for October 2005, with the ongoing series Infiltration beginning in January 2006.", source: { ref: "wp-idw", loc: "First era" } },
+      cmpId: "join" },
+    { id: "idw-end", eraId: "idw", date: { iso: "2018-11" }, title: "IDW's run ends with Unicron",
+      text: "The run ended after the six-issue Unicron event comic. A new series in 2019 rebooted and succeeded it.",
+      source: { ref: "wp-idw", loc: "lead" } },
+
+    { id: "film-2007", eraId: "film", date: { iso: "2007-07-03" }, title: "Transformers (2007) is released in the U.S.",
+      claims: [{ text: "Michael Bay's film had premiered on June 10, 2007 in Seoul.", source: { ref: "wp-film", loc: "lead and Plot" } }, "allspark-hunt"],
+      loreId: "allspark" },
+
+    { id: "prime-start", eraId: "aligned", date: { iso: "2010-11-26" }, title: "Transformers: Prime premieres",
+      claims: [{ text: "The series aired on The Hub.", source: { ref: "wp-prime", loc: "lead and Premise" } }, "aligned-team",
+        { text: "The show sits in the Aligned continuity with related books and video games.", source: { ref: "wp-prime", loc: "lead and Premise" } }],
+      loreId: "matrix" },
+    { id: "prime-end", eraId: "aligned", date: { iso: "2013-10-04" }, title: "Prime's series concludes",
+      claims: [{ text: "The series concluded on October 4, 2013 with the TV film Predacons Rising.", source: { ref: "wp-prime", loc: "lead" } },
+        { text: "In it Unicron seeks to kill Cybertron's core.", source: { ref: "wp-prime", loc: "Synopsis › Predacons Rising" } }, "prime-primus-core"],
+      loreId: "cybertron", cmpId: "unicron" }
+  ],
+
+  /* Lore topics. Level 0: name + gist (≤25 words). Level 1: paragraphs (≤60 words). Level 2: variants.
+     A paragraph or variant may carry a label, shown before its text, as the comparisons do. */
+  lore: [
+    { id: "cybertron", name: "Cybertron", gist: "The Transformers' home world, shown ruined by civil war in the G1 cartoon and described very differently from one continuity to the next.",
+      paragraphs: [
+        { claims: ["g1-cybertron-war", "g1-ark"] },
+        { label: "G1 cartoon", claim: "quintessons-create", cmpId: "origins" }
+      ],
+      variants: [
+        { continuityId: "g1", label: "G1, UK Marvel comic", claim: "primus-uk-creator" },
+        { continuityId: "bw", claims: ["bm-organic", { text: "The Beast Wars franchise also takes from the comics the idea of Cybertron having an organic core.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }] },
+        { continuityId: "aligned", claim: "prime-primus-core" }
+      ] },
+    { id: "allspark", name: "The AllSpark", gist: "In the 2007 film, a lost artifact that both factions hunt: the source of all Cybertronian life.",
+      paragraphs: [
+        { claims: [{ text: "In the 2007 live-action film, Cybertron was ravaged by a civil war between the Autobots, led by Optimus Prime, and the Decepticons, led by Megatron.", source: { ref: "wp-film", loc: "Plot" } }, "allspark-hunt"] },
+        { text: "During development, producers Don Murphy and Tom DeSanto made the Creation Matrix their plot device, but Murphy had it renamed because of the film series The Matrix.", source: [{ ref: "wp-film", loc: "Production and infobox (producers)" }] }
+      ],
+      note: "This topic covers the film's account only. The films are not one of the five continuities on the map, and this page has not sourced how the AllSpark is treated elsewhere. The source does not say what the Creation Matrix was renamed to." },
+    { id: "primes", name: "The Primes", gist: "Optimus Prime leads the Autobots; G1 gives him a successor, Rodimus Prime, and Aligned adds the Thirteen, the original Primes.",
+      paragraphs: [
+        { claims: ["optimus-role", { text: "His original name, in some continuities, is Orion Pax.", source: { ref: "wp-optimus", loc: "lead" } }] },
+        { claims: ["film86-prime-dies", "optimus-revived"] },
+        { text: "In Transformers: Prime, Alpha Trion, Optimus's deceased mentor who appears as a vision, is a member of the Thirteen, the original Primes.",
+          source: { ref: "wp-prime", loc: "Characters › Miscellaneous" } }
+      ],
+      variants: [
+        { continuityId: "bw", claims: ["bw-original-optimus", { text: "Megatron attempts to kill him, and at the start of the third season Optimus Primal manages to preserve his spark.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }] }
+      ] },
+    { id: "matrix", name: "The Matrix of Leadership", gist: "An artifact tied to Autobot leadership; what it is and what it does differs between the G1 cartoon, the G1 comic and Aligned.",
+      paragraphs: [
+        { label: "G1 cartoon, 1986 film", claims: ["matrix-g1-cartoon", { text: "Unicron fears the Matrix's power.", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } }], cmpId: "matrix" }
+      ],
+      variants: [
+        { continuityId: "g1", label: "G1, Marvel comic", claim: "matrix-marvel" },
+        { continuityId: "aligned", claim: "matrix-aligned" }
+      ] },
+    { id: "split", name: "The Autobot/Decepticon split", gist: "How a civil war between two Cybertronian factions began depends on which telling you read.",
+      paragraphs: [
+        { text: "In the G1 cartoon's backstory the robots developed emotions and rebelled in the first Cybertronian War. Later the Decepticons attempted a coup. The Autobots won the second war by developing transformation; the Decepticons copied it, made Megatron their leader, and began a third.",
+          cmpId: "megatron", source: { ref: "wp-g1", loc: "Premise" } }
+      ],
+      variants: [
+        { continuityId: "g1", label: "G1, Marvel comic", claim: "megatron-gladiator" },
+        { continuityId: "bw", claim: "bw-descend" },
+        { label: "Transformers One (2024 film; not one of the five continuities)", text: "Megatron is D-16, a miner who takes the name after killing Sentinel Prime. His friend Orion Pax gains the Matrix and becomes Optimus Prime, starting the civil war.", source: { ref: "wp-megatron", loc: "History" } }
+      ] }
+  ],
+
+  /* Character filters. factions, eras and roles are lists of ids; eras reuse DATA.eras ids. */
+  factions: [
+    { id: "autobot", name: "Autobot" }, { id: "decepticon", name: "Decepticon" },
+    { id: "maximal", name: "Maximal" }, { id: "predacon", name: "Predacon" }, { id: "neither", name: "Neither side" }
+  ],
+  roles: [
+    { id: "leader", name: "Leader" }, { id: "second", name: "Second-in-command" }, { id: "scout", name: "Scout" },
+    { id: "creator", name: "Creator" }, { id: "antagonist", name: "Antagonist" }
+  ],
+  /* profileSource backs faction, era and role. firstAppearance null renders "unknown".
+     description is { text, source } or { claims }; cmpId links the comparison where the accounts differ. */
+  characters: [
+    { id: "optimus-prime", name: "Optimus Prime", factions: ["autobot"], eras: ["g1", "bw", "ut", "film", "aligned"], roles: ["leader"],
+      profileSource: [{ ref: "wp-optimus", loc: "lead, History and infobox (voice credits)" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000); Live-action film franchise (2007–present)" }, { ref: "wp-prime", loc: "Synopsis" }],
+      firstAppearance: { value: "1984", source: { ref: "wp-optimus", loc: "infobox (first appearance)" } },
+      description: { claims: ["optimus-role", "film86-prime-dies", "optimus-revived"] } },
+    { id: "megatron", name: "Megatron", factions: ["decepticon"], eras: ["g1", "film", "aligned"], roles: ["leader", "antagonist"],
+      profileSource: [{ ref: "wp-megatron", loc: "lead and History" }, { ref: "wp-prime", loc: "Synopsis" }],
+      firstAppearance: { value: "1984", source: { ref: "wp-megatron", loc: "History" } },
+      description: { text: "Leader of the Decepticons and Optimus Prime's archenemy.", source: { ref: "wp-megatron", loc: "History" } },
+      cmpId: "megatron" },
+    { id: "starscream", name: "Starscream", factions: ["decepticon"], eras: ["g1", "bw", "film", "aligned", "idw"], roles: ["second"],
+      profileSource: [{ ref: "wp-starscream", loc: "lead and History" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }, { ref: "wp-prime", loc: "Synopsis" }],
+      firstAppearance: { value: "1984", source: { ref: "wp-starscream", loc: "infobox (first appearance)" } },
+      description: { text: "Second-in-command of the Decepticons, usually a treacherous air commander who seeks to overthrow Megatron. His toy first appeared in a 1983 Diaclone catalog.", source: { ref: "wp-starscream", loc: "lead and History" } } },
+    { id: "bumblebee", name: "Bumblebee", factions: ["autobot"], eras: ["g1", "film", "aligned"], roles: ["scout"],
+      profileSource: { ref: "wp-bumblebee", loc: "lead and History" },
+      firstAppearance: { value: "1984", source: { ref: "wp-bumblebee", loc: "History" } },
+      description: { claims: [{ text: "A small Autobot scout, a yellow Volkswagen Beetle in the original toys and cartoon.", source: { ref: "wp-bumblebee", loc: "lead and History" } }, "bumblebee-bw-rights"] } },
+    { id: "rodimus-prime", name: "Rodimus Prime", factions: ["autobot"], eras: ["g1"], roles: ["leader"],
+      profileSource: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" },
+      firstAppearance: { value: "1986", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
+      description: { claims: [{ label: "G1 cartoon, 1986 film", claim: "matrix-g1-cartoon" }] },
+      cmpId: "matrix" },
+    { id: "galvatron", name: "Galvatron", factions: ["decepticon"], eras: ["g1", "film"], roles: ["antagonist"],
+      profileSource: { ref: "wp-megatron", loc: "History" },
+      firstAppearance: { value: "1986", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
+      description: { text: "In the 1986 film Unicron finds the mortally wounded Megatron and rebuilds him as Galvatron, a puppet of Unicron.", source: { ref: "wp-megatron", loc: "History" } } },
+    { id: "unicron", name: "Unicron", factions: ["neither"], eras: ["g1", "ut", "film", "aligned", "idw"], roles: ["antagonist"],
+      profileSource: [{ ref: "wp-unicron", loc: "Fictional character biography" }, { ref: "wp-anim", loc: "Unicron Trilogy" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }, { ref: "wp-idw", loc: "lead" }],
+      firstAppearance: { value: "1986", source: { ref: "wp-unicron", loc: "lead" } },
+      description: { claims: [{ text: "An evil god-like being who can transform into a giant mechanical planet.", source: { ref: "wp-unicron", loc: "lead" } }, { label: "Transformers: Prime", claim: "unicron-aligned" }] },
+      cmpId: "unicron" },
+    { id: "optimus-primal", name: "Optimus Primal", factions: ["maximal"], eras: ["bw"], roles: ["leader"],
+      profileSource: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" },
+      firstAppearance: { value: "1996", source: { ref: "wp-anim", loc: "Beast Era › Beast Wars: Transformers" } },
+      description: { claims: [{ text: "Leads a small group of Maximals, the new Autobots.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }, "bw-crash"] } },
+    { id: "bw-megatron", name: "Megatron (Beast Wars)", factions: ["predacon"], eras: ["bw"], roles: ["leader", "antagonist"],
+      profileSource: [{ ref: "wp-megatron", loc: "History" }, { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }],
+      firstAppearance: { value: "1996", source: { ref: "wp-anim", loc: "Beast Era › Beast Wars: Transformers" } },
+      description: { claims: ["megatron-bw", "bw-descend"] },
+      cmpId: "megatron" },
+    { id: "primus", name: "Primus", factions: ["neither"], eras: ["g1", "aligned"], roles: ["creator"],
+      profileSource: [{ ref: "wp-franchise", loc: "Marvel comics (1984-1995)" }, { ref: "wp-prime", loc: "Characters › Miscellaneous" }],
+      firstAppearance: null,
+      description: { claims: [{ label: "UK Marvel comic", claim: "primus-uk-creator" }, { label: "Transformers: Prime", claim: "prime-primus-core" }] },
+      cmpId: "origins" },
+    { id: "quintessons", name: "The Quintessons", factions: ["neither"], eras: ["g1"], roles: ["creator", "antagonist"],
+      profileSource: { ref: "wp-g1", loc: "Premise" },
+      firstAppearance: { value: "1986", source: { ref: "wp-g1", loc: "Premise" } },
+      description: { claims: [{ text: "A cruel, coldly logical alien race with five faces and tentacles. The movie established them.", source: { ref: "wp-g1", loc: "Premise" } }, { label: "G1 cartoon", claim: "quintessons-create" }] },
+      cmpId: "origins" }
+  ],
+
+  /* Continuities. ORDER HERE IS THE COLUMN ORDER EVERYWHERE; it is not a ranking.
+     A continuity shares its id with an era and takes that era's name and years: they are not typed again here.
+     source backs media and the premise; premise is claims. short is the label on the map. */
+  continuities: [
+    { id: "g1", short: "G1", media: "Toy line, Marvel comic, animated series, 1986 film",
+      claims: ["g1-cybertron-war", "g1-ark"],
+      source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993)" }, { ref: "wp-g1", loc: "Premise" }] },
+    { id: "bw", short: "Beast era", media: "Toy line, CGI series Beast Wars, Beast Machines",
+      claims: ["bw-crash"],
+      source: [{ ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" }, { ref: "wp-bw", loc: "Premise" }] },
+    { id: "ut", short: "Unicron Trilogy", media: "Toy lines and anime series Armada, Energon, Cybertron",
+      claims: [{ text: "Three anime series, Armada, Energon and Cybertron, in which Unicron plays a major role.", source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] },
+        "ut-minicons", "ut-blackhole", "cybertron-reboot", "cybertron-hasbro"],
+      source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] },
+    { id: "aligned", short: "Aligned", media: "Transformers: Prime, video games, novels, other series",
+      claims: ["aligned-team", "aligned-unify"],
+      source: [{ ref: "wp-franchise", loc: "Aligned Universe (2010–2021)" }, { ref: "wp-prime", loc: "Premise" }] },
+    { id: "idw", short: "IDW", media: "IDW Publishing comics",
+      claims: [{ text: "Launched in 2005 by writer Simon Furman as a contemporary version of G1; later written by many others.", source: { ref: "wp-idw", loc: "lead and First era" } }, "idw-furman"],
+      source: { ref: "wp-idw", loc: "lead and First era" } }
+  ],
+
+  /* Edges: relation is 16 characters or fewer. "differs on N" is derived from the comparisons. */
+  edges: [
+    { from: "bw", to: "g1", relation: "part of",
+      source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
+    { from: "ut", to: "g1", relation: "reboots",
+      source: { ref: "wp-anim", loc: "Unicron Trilogy" } },
+    { from: "idw", to: "bw", relation: "set apart from",
+      source: { ref: "wp-idw", loc: "First era" } }
+  ],
+
+  /* Comparison sets: the contradictions. A continuity with no sourced account is left out, not shown empty. */
+  comparisons: [
+    { id: "origins", question: "Where do the Transformers and Cybertron come from?",
+      positions: [
+        { continuityId: "g1", accounts: [
+          { label: "Cartoon", claim: "quintessons-create" },
+          { label: "Cartoon, as the franchise article tells it", text: "The Quintessons used Cybertron as a factory; their robots rebel, and in time the workers become the Autobots and the soldiers become the Decepticons. The article's own note says this appears to contradict the background presented in the first two seasons of the series.", source: { ref: "wp-franchise", loc: "Generation 1 (1984–1993)" } },
+          { label: "UK Marvel comic", claim: "primus-uk-creator" } ] },
+        { continuityId: "bw", accounts: [
+          { claim: "bm-organic" } ] },
+        { continuityId: "aligned", accounts: [
+          { claim: "prime-primus-core" } ] }
+      ] },
+    { id: "megatron", question: "Who is Megatron?",
+      positions: [
+        { continuityId: "g1", accounts: [
+          { label: "Cartoon", text: "A ruthless military dictator who wants to win the war against the Autobots at any cost.", source: { ref: "wp-megatron", loc: "History" } },
+          { label: "Marvel comic", claim: "megatron-gladiator" } ] },
+        { continuityId: "bw", accounts: [
+          { claim: "megatron-bw" } ] }
+      ] },
+    { id: "matrix", question: "What does the Matrix of Leadership do?",
+      positions: [
+        { continuityId: "g1", accounts: [
+          { label: "Cartoon", claim: "matrix-g1-cartoon" },
+          { label: "Marvel comic", claim: "matrix-marvel" } ] },
+        { continuityId: "aligned", accounts: [
+          { claim: "matrix-aligned" } ] }
+      ] },
+    { id: "unicron", question: "What is Unicron?",
+      positions: [
+        { continuityId: "g1", accounts: [
+          { text: "In the 1986 film, a Transformer who devours planets and re-creates Megatron as Galvatron. In the UK comic, Primus's nemesis.", source: [{ ref: "wp-franchise", loc: "Generation 1 (1984–1993); Marvel comics (1984-1995)" }] } ] },
+        { continuityId: "ut", accounts: [
+          { claims: ["ut-minicons", { text: "In Energon the Decepticons and Terrorcons try to resurrect him.", source: [{ ref: "wp-franchise", loc: "The Unicron Trilogy (2002–2006)" }, { ref: "wp-anim", loc: "Unicron Trilogy" }] }, "ut-blackhole"] } ] },
+        { continuityId: "aligned", accounts: [
+          { claim: "unicron-aligned" } ] }
+      ] },
+    { id: "join", question: "Do these stories join up into one history?",
+      positions: [
+        { continuityId: "bw", accounts: [
+          { text: "Planned to start afresh with no ties to what came before, but an off-hand reference to the \"Great War\" in the first episode fed fan speculation.", source: { ref: "wp-anim", loc: "Beast Era › Beast Wars: Transformers" } },
+          { text: "The writers then used G1 elements as historical backstory, establishing Beast Wars as part of the Generation 1 universe through many callbacks.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } } ] },
+        { continuityId: "ut", accounts: [
+          { claims: [{ text: "Japan's production team wanted a G1 setting; Hasbro's Aaron Archer vetoed it in favour of a complete reboot.", source: { ref: "wp-anim", loc: "Unicron Trilogy" } }, "cybertron-reboot", "cybertron-hasbro"] } ] },
+        { continuityId: "aligned", accounts: [
+          { claim: "aligned-unify" } ] },
+        { continuityId: "idw", accounts: [
+          { claim: "idw-furman" } ] }
+      ] }
+  ],
+
+  /* Quiz. answer is an index into options. explanation is text with a source, or claims. */
+  quiz: [
+    { id: "q-toys", question: "Which toys were rebranded to create the original 1984 Transformers line?",
+      options: ["Takara's Diaclone and Micro Change robots", "Original designs by Hasbro's Marvel team", "Beast-shaped robots from Mainframe Entertainment"], answer: 0,
+      claim: "toys-1984",
+      sectionId: "timeline" },
+    { id: "q-creators", question: "In the G1 cartoon, who were revealed as the creators of the Autobots and Decepticons?",
+      options: ["Primus", "The Quintessons", "Unicron"], answer: 1,
+      claim: "quintessons-create",
+      sectionId: "continuities" },
+    { id: "q-beast", question: "In Beast Wars, why do the robots take beast forms?",
+      options: ["The planet's energon is at a dangerous level, so they need organic forms to function without going into stasis lock", "The Quintessons ordered it as a punishment", "Beast forms were always their natural shape"], answer: 0,
+      explanation: "The crash-landing planet has a dangerous level of energon, which forces them to take organic beast forms in order to function.",
+      sectionId: "timeline", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } },
+    { id: "q-bee", question: "According to Wikipedia, which of these characters could not appear in Beast Wars because Hasbro had lost the rights to the name?",
+      options: ["Optimus Prime", "Starscream", "Bumblebee"], answer: 2,
+      claims: ["bumblebee-bw-rights", "bw-original-optimus", { text: "Starscream also appears in Beast Wars.", source: { ref: "wp-franchise", loc: "Beast Wars and Beast Machines (1996–2000)" } }],
+      sectionId: "characters" },
+    { id: "q-matrix", question: "In the Marvel comic, what does the Creation Matrix do?",
+      options: ["It gives life to machines", "It turns Autobots into Decepticons", "It powers the Ark"], answer: 0,
+      claim: "matrix-marvel",
+      sectionId: "lore" }
+  ]
+};
+
+/* =====================================================================
+   Render code. Reads DATA; holds no content of its own.
+   ===================================================================== */
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const NARROW_QUERY = "(width < 40rem)";
+const state = {
+  era: "all",
+  filters: { faction: [], era: [], role: [] },
+  openCards: [],
+  quiz: { i: 0, firstTry: {} }
+};
+
+function $(sel, root) { return (root || document).querySelector(sel); }
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v === null || v === undefined || v === false) continue;
+    el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const kid of kids.flat()) {
+    if (kid === null || kid === undefined || kid === false) continue;
+    el.append(kid);
+  }
+  return el;
+}
+function svg(tag, props, ...kids) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(props || {})) el.setAttribute(k, v);
+  for (const kid of kids.flat()) if (kid !== null && kid !== undefined) el.append(kid);
+  return el;
+}
+function byId(list, id, what) {
+  const found = list.find(x => x.id === id);
+  if (!found) throw new Error("Unknown " + what + " id: " + id);
+  return found;
+}
+/* A continuity shares its id with an era and takes that era's name and years. */
+const eraOf = c => byId(DATA.eras, c.id, "era");
+const contName = id => eraOf(byId(DATA.continuities, id, "continuity")).name;
+
+/* ---- Sources ---- */
+function sourceItem(s) {
+  const meta = DATA.sources[s && s.ref];
+  if (!meta || !meta.title) throw new Error("Source reference missing or empty: " + JSON.stringify(s));
+  const title = meta.url ? h("a", { href: meta.url }, meta.title) : h("cite", {}, meta.title);
+  return h("span", {}, title, s.loc ? ", " + s.loc : "", meta.kind ? " (" + meta.kind + ")" : "");
+}
+function sourceNote(src) {
+  const items = [].concat(src);
+  if (!items.length) throw new Error("A source note needs at least one source");
+  const kids = ["Source: "];
+  items.forEach((s, i) => { if (i) kids.push("; "); kids.push(sourceItem(s)); });
+  kids.push(".");
+  return h("p", { class: "source-note" }, ...kids);
+}
+const srcKey = s => s.ref + "|" + (s.loc || "");
+function mergeSources(...lists) {
+  const seen = new Set(), out = [];
+  lists.flat().forEach(s => { if (s && !seen.has(srcKey(s))) { seen.add(srcKey(s)); out.push(s); } });
+  return out;
+}
+
+/* ---- Claims: a record's prose is its own `key` text, or the DATA.claims it points at ---- */
+function claimPart(item) {
+  if (typeof item !== "string") {
+    if (!item.claim) return item;
+    const c = claimPart(item.claim);   /* { label, claim }: the label frames a continuity-specific claim */
+    return { text: item.label + ": " + c.text, source: c.source };
+  }
+  const c = DATA.claims[item];
+  if (!c) throw new Error("Unknown claim id: " + item);
+  return c;
+}
+function resolve(rec, key = "text") {
+  const items = [].concat(rec.claim || rec.claims || []);
+  if (!items.length) {
+    if (typeof rec[key] !== "string") throw new Error("Record has neither " + key + " nor claims: " + JSON.stringify(rec).slice(0, 80));
+    return { text: rec[key], source: mergeSources(rec.source) };
+  }
+  if (key in rec) throw new Error("Record has both claims and its own " + key + ": " + rec[key].slice(0, 60));
+  const parts = items.map(claimPart);
+  return { text: parts.map(c => c.text).join(" "), source: mergeSources(...parts.map(c => c.source)) };
+}
+
+/* ---- Dates (display derived from the ISO string, which is never altered) ---- */
+function fmtIso(iso) {
+  const p = iso.split("-");
+  if (p.length === 1) return p[0];
+  if (p.length === 2) return MONTHS[+p[1] - 1] + " " + p[0];
+  return +p[2] + " " + MONTHS[+p[1] - 1] + " " + p[0];
+}
+function dateNode(date) {
+  if (!date || !date.iso) return h("span", { class: "unknown" }, "date unknown");
+  if (date.confidence === "approximate") return h("span", {}, "c. " + fmtIso(date.iso), h("span", { class: "tag" }, "approx."));
+  if (date.confidence === "disputed") return h("span", {}, fmtIso(date.iso), h("span", { class: "tag" }, "disputed"));
+  return h("time", { datetime: date.iso }, fmtIso(date.iso));
+}
+
+/* ---- Error handling: every render entry point goes through safe() ---- */
+function errorBox(err) {
+  return h("div", { role: "alert", class: "error" },
+    h("p", { class: "error-title" }, h("span", { "aria-hidden": "true" }, "⚠ "), "This section failed to render"),
+    h("p", {}, "The rest of the page still works. Reload to try again."),
+    h("pre", {}, String((err && err.message) || err)));
+}
+function safe(sectionId, fn) {
+  try {
+    if (new URLSearchParams(location.search).get("fail") === sectionId) {
+      throw new Error("Simulated failure requested with ?fail=" + sectionId);
+    }
+    fn();
+  } catch (err) {
+    $("#" + sectionId + "-body").replaceChildren(errorBox(err));
+  }
+}
+
+/* ---- Navigation: in-page links open their target and move focus to it ---- */
+function goTo(target) {
+  if (target.tagName === "DETAILS") {
+    target.open = true;
+    const sum = target.querySelector(":scope > summary");
+    sum.scrollIntoView();
+    sum.focus({ preventScroll: true });
+    return;
+  }
+  const focusable = target.tagName === "SECTION" ? target.querySelector("h2") : target;
+  if (!focusable.hasAttribute("tabindex")) focusable.setAttribute("tabindex", "-1");
+  focusable.scrollIntoView();
+  focusable.focus({ preventScroll: true });
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a || a.getAttribute("href").length < 2) return;
+  const target = document.getElementById(decodeURIComponent(a.getAttribute("href").slice(1)));
+  if (!target) return;
+  e.preventDefault();
+  goTo(target);
+});
+
+/* ---- 1. Era timeline ---- */
+function initRail() {
+  const box = $("#era-options");
+  const opts = [{ id: "all", name: "All eras", years: "" }].concat(DATA.eras);
+  box.replaceChildren(...opts.map(o => h("label", {},
+    h("input", { type: "radio", name: "era", value: o.id, checked: o.id === state.era }),
+    h("span", {}, o.name), o.years ? h("span", { class: "years" }, o.years) : null)));
+  box.addEventListener("change", e => {
+    state.era = e.target.value;
+    safe("timeline", () => renderTimeline(true));
+  });
+  $("#era-empty").addEventListener("click", e => {
+    if (!e.target.closest("[data-show-all]")) return;
+    state.era = "all";
+    const all = $('#era-options input[value="all"]');
+    all.checked = true;
+    safe("timeline", () => renderTimeline(true));
+    all.focus();
+  });
+}
+function entryNode(en) {
+  const prose = resolve(en);
+  const kids = [h("h3", {}, en.title), h("p", {}, prose.text), sourceNote(prose.source)];
+  if (en.loreId) {
+    const topic = byId(DATA.lore, en.loreId, "lore topic");
+    kids.push(h("p", {}, "Related lore: ", h("a", { href: "#lore-" + topic.id }, topic.name), "."));
+  }
+  if (en.cmpId) {
+    const cmp = byId(DATA.comparisons, en.cmpId, "comparison");
+    kids.push(h("p", {}, "Accounts differ: ", h("a", { href: "#cmp-" + cmp.id }, cmp.question), "."));
+  }
+  if (en.more) kids.push(h("details", {}, h("summary", {}, "More"), h("p", {}, en.more.text), sourceNote(en.more.source)));
+  return h("li", { class: "entry", id: "entry-" + en.id },
+    h("div", { class: "date" }, dateNode(en.date)), h("div", { class: "entry-body" }, ...kids));
+}
+function renderTimeline(announce) {
+  const sel = state.era === "all" ? null : byId(DATA.eras, state.era, "era");
+  const entries = DATA.entries.filter(en => !sel || en.eraId === sel.id);
+  const list = $("#era-list"), summary = $("#era-summary"), empty = $("#era-empty"), out = $("#era-count");
+  const sum = sel ? resolve(sel, "summary") : null;
+  summary.replaceChildren(...(sel ? [
+    h("p", {}, h("strong", {}, sel.name), " · ", sel.years), h("p", {}, sum.text), sourceNote(mergeSources(sel.source, sum.source))] : []));
+  empty.replaceChildren();
+  if (!entries.length) {
+    list.replaceChildren();
+    empty.append(h("div", { class: "empty" }, h("p", {}, "No entries match " + sel.name + "."),
+      h("button", { type: "button", class: "btn", "data-show-all": "" }, "Show all eras")));
+    if (announce) out.textContent = "No entries recorded for " + sel.name;
+    return;
+  }
+  const items = [];
+  (sel ? [sel] : DATA.eras).forEach(era => {
+    const mine = entries.filter(en => en.eraId === era.id);
+    if (!sel && mine.length) items.push(h("li", { class: "era-divider" }, era.name + " · " + era.years));
+    mine.forEach(en => items.push(entryNode(en)));
+  });
+  list.replaceChildren(...items);
+  if (announce) {
+    out.textContent = sel
+      ? "Showing " + entries.length + (entries.length === 1 ? " entry" : " entries") + " from " + sel.name
+      : "Showing all " + entries.length + " entries";
+  }
+}
+
+/* ---- 2. Lore explorer ---- */
+function loreTopic(t) {
+  const body = [];
+  t.paragraphs.forEach(p => {
+    const prose = resolve(p);
+    body.push(h("p", {}, p.label ? [h("strong", {}, p.label), ": "] : null, prose.text));
+    if (p.cmpId) body.push(h("p", { class: "meta" }, "Other continuities tell this differently: ", h("a", { href: "#cmp-" + byId(DATA.comparisons, p.cmpId, "comparison").id }, "compare accounts"), "."));
+    body.push(sourceNote(prose.source));
+  });
+  if (t.note) body.push(h("p", { class: "scope" }, t.note));
+  if (t.variants && t.variants.length) {
+    const cmps = DATA.comparisons.filter(c => t.paragraphs.some(p => p.cmpId === c.id));
+    body.push(h("details", { class: "disc variants-wrap" }, h("summary", {}, "In other continuities"),
+      h("ul", { class: "variants" }, t.variants.map(v => { const prose = resolve(v); return h("li", {},
+        h("p", {}, h("strong", {}, v.label || contName(v.continuityId)), ": ", prose.text), sourceNote(prose.source)); })),
+      cmps.length ? h("p", {}, "Compare accounts: ", cmps.flatMap((c, i) => [i ? ", " : "", h("a", { href: "#cmp-" + c.id }, c.question)])) : null));
+  }
+  return h("details", { class: "topic", id: "lore-" + t.id },
+    h("summary", {}, h("div", {}, h("h3", {}, t.name), h("p", { class: "gist" }, t.gist))),
+    h("div", { class: "topic-body" }, ...body));
+}
+function topics() { return [...document.querySelectorAll("#lore-list > details.topic")]; }
+function syncLoreButton() {
+  $("#lore-all").textContent = topics().every(d => d.open) ? "Close all topics" : "Open all topics";
+}
+function renderLore() {
+  $("#lore-list").replaceChildren(...DATA.lore.map(loreTopic));
+  syncLoreButton();
+}
+function initLore() {
+  $("#lore-all").addEventListener("click", () => safe("lore", () => {
+    const open = !topics().every(d => d.open);
+    topics().forEach(d => { d.open = open; });
+    syncLoreButton();
+  }));
+  $("#lore-list").addEventListener("toggle", e => { if (e.target.classList.contains("topic")) syncLoreButton(); }, true);
+}
+
+/* ---- 3. Character browser ---- */
+const GROUPS = [
+  { key: "faction", legend: "Faction", list: "factions", field: "factions" },
+  { key: "era", legend: "Eras (on this page)", list: "eras", field: "eras" },
+  { key: "role", legend: "Role", list: "roles", field: "roles" }
+];
+const MAX_CHIPS = 7;
+function chip(group, opt) {
+  return h("button", { type: "button", class: "chip", "aria-pressed": "false", "data-group": group.key, "data-id": opt.id },
+    h("span", { "aria-hidden": "true", class: "tick" }), opt.name);
+}
+function renderFilters() {
+  const groups = GROUPS.map(g => {
+    const opts = DATA[g.list];
+    const shown = opts.slice(0, MAX_CHIPS), rest = opts.slice(MAX_CHIPS);
+    return h("fieldset", {}, h("legend", {}, g.legend),
+      h("div", { class: "chips" }, shown.map(o => chip(g, o))),
+      rest.length ? h("details", { class: "more" }, h("summary", {}, "More"), h("div", { class: "chips" }, rest.map(o => chip(g, o)))) : null);
+  });
+  $("#char-filters").replaceChildren(h("details", { class: "filters", id: "filters" },
+    h("summary", { id: "filters-summary" }, "Filters"),
+    h("div", { class: "filter-groups" }, groups),
+    h("p", { class: "rule" }, "Within a group, any pressed chip matches. Across groups, all groups must match.")));
+  $("#filters").open = !matchMedia(NARROW_QUERY).matches;
+}
+const pressedCount = () => GROUPS.reduce((n, g) => n + state.filters[g.key].length, 0);
+function syncChips() {
+  document.querySelectorAll("#char-filters .chip").forEach(c => {
+    const on = state.filters[c.dataset.group].includes(c.dataset.id);
+    c.setAttribute("aria-pressed", on ? "true" : "false");
+    $(".tick", c).textContent = on ? "✓ " : "";
+  });
+  const n = pressedCount();
+  $("#filters-summary").textContent = n ? "Filters (" + n + " on)" : "Filters";
+}
+const matches = c => GROUPS.every(g => state.filters[g.key].length === 0 || state.filters[g.key].some(id => c[g.field].includes(id)));
+function describeFilters() {
+  return GROUPS.filter(g => state.filters[g.key].length)
+    .map(g => g.legend + ": " + state.filters[g.key].map(id => byId(DATA[g.list], id, g.legend).name).join(" or ")).join(" + ");
+}
+/* One Details pattern for character and continuity cards: open state lives in state.openCards, the DOM is derived from it. */
+function detailsButton(id) {
+  const open = state.openCards.includes(id);
+  return h("button", { type: "button", class: "btn", id: "b-" + id, "data-details": id, "aria-labelledby": "b-" + id + " h-" + id, "aria-expanded": open ? "true" : "false" }, open ? "Hide details" : "Details");
+}
+function detailsRegion(id, ...kids) {
+  return h("div", { class: "region", id: "r-" + id, hidden: !state.openCards.includes(id) }, ...kids);
+}
+function toggleDetails(b) {
+  const id = b.dataset.details, i = state.openCards.indexOf(id);
+  if (i < 0) state.openCards.push(id); else state.openCards.splice(i, 1);
+  const open = i < 0;
+  b.setAttribute("aria-expanded", open ? "true" : "false");
+  b.textContent = open ? "Hide details" : "Details";
+  $("#r-" + id).hidden = !open;
+}
+function cmpLink(id) {
+  return id ? h("p", { class: "meta" }, "Accounts differ: ", h("a", { href: "#cmp-" + byId(DATA.comparisons, id, "comparison").id }, byId(DATA.comparisons, id, "comparison").question), ".") : null;
+}
+function cardNode(c) {
+  const refs = [], index = {};
+  const reg = srcs => [].concat(srcs).map(s => {
+    const k = srcKey(s);
+    if (!(k in index)) { index[k] = refs.length + 1; refs.push(s); }
+    return index[k];
+  });
+  const profile = reg(c.profileSource), first = c.firstAppearance ? reg(c.firstAppearance.source) : [];
+  const names = (list, ids, what) => ids.map(id => byId(list, id, what).name).join(", ");
+  const sup = nums => nums.length && refs.length > 1 ? h("sup", { class: "src-ref" }, " " + nums.join(",")) : null;
+  const firstDd = c.firstAppearance
+    ? h("dd", {}, c.firstAppearance.value, c.firstAppearance.confidence === "approximate" ? h("span", { class: "tag" }, "approx.") : null,
+        c.firstAppearance.confidence === "disputed" ? h("span", { class: "tag" }, "disputed") : null, sup(first))
+    : h("dd", { class: "unknown" }, "unknown");
+  const desc = resolve(c.description);
+  return h("article", { class: "card", id: "char-" + c.id, tabindex: "-1" },
+    h("h3", { id: "h-" + c.id }, c.name),
+    h("dl", { class: "facts" },
+      h("dt", {}, "Faction"), h("dd", {}, names(DATA.factions, c.factions, "faction"), sup(profile)),
+      h("dt", {}, "Era"), h("dd", {}, names(DATA.eras, c.eras, "era"), sup(profile)),
+      h("dt", {}, "Role"), h("dd", {}, names(DATA.roles, c.roles, "role"), sup(profile)),
+      h("dt", {}, "First appearance"), firstDd),
+    refs.length > 1
+      ? h("ol", { class: "source-note" }, refs.map(s => h("li", {}, sourceItem(s))))
+      : sourceNote(refs),
+    detailsButton(c.id),
+    detailsRegion(c.id, h("p", {}, desc.text), sourceNote(desc.source), cmpLink(c.cmpId)));
+}
+function renderCards(announce) {
+  const shown = DATA.characters.filter(matches), total = DATA.characters.length;
+  const out = $("#char-count"), grid = $("#char-cards");
+  if (!shown.length) {
+    const why = describeFilters();
+    grid.replaceChildren(h("div", { class: "empty" }, h("p", {}, "No characters on this page match these filters. The roster is a selection, not every Transformer. Try fewer filters."),
+      h("button", { type: "button", class: "btn", "data-clear": "" }, "Clear filters")));
+    out.textContent = "No characters match " + why;
+    return;
+  }
+  grid.replaceChildren(...shown.map(cardNode));
+  if (announce) out.textContent = pressedCount() ? shown.length + " of " + total + " characters" : "Showing all " + total + " characters";
+}
+function clearFilters() {
+  const out = $("#char-count");
+  if (!pressedCount()) { out.textContent = "No filters are on."; return; }
+  const det = $("#filters");
+  if (!det.open) det.open = true;
+  GROUPS.forEach(g => { state.filters[g.key] = []; });
+  syncChips();
+  renderCards(false);
+  out.textContent = "Showing all " + DATA.characters.length + " characters";
+  $('#char-filters .chip[data-group="faction"]').focus();
+}
+function initCharacters() {
+  $("#char-filters").addEventListener("click", e => {
+    const c = e.target.closest(".chip");
+    if (!c) return;
+    safe("characters", () => {
+      const arr = state.filters[c.dataset.group], i = arr.indexOf(c.dataset.id);
+      if (i < 0) arr.push(c.dataset.id); else arr.splice(i, 1);
+      syncChips();
+      renderCards(true);
+    });
+  });
+  $("#char-clear").addEventListener("click", () => safe("characters", clearFilters));
+  $("#char-cards").addEventListener("click", e => {
+    if (e.target.closest("[data-clear]")) safe("characters", clearFilters);
+  });
+  matchMedia(NARROW_QUERY).addEventListener("change", e => {
+    const det = $("#filters");
+    if (det && !e.matches) det.open = true;
+  });
+}
+
+/* ---- 4. Continuity map ---- */
+const sharedCount = (a, b) => DATA.comparisons.filter(c => c.positions.some(p => p.continuityId === a) && c.positions.some(p => p.continuityId === b)).length;
+function renderContinuities() {
+  const root = $("#continuities-body");
+  const narrow = matchMedia(NARROW_QUERY).matches;
+  const pos = DATA.continuities.map((c, i) => ({ c, x: 60 + i * 110, y: i % 2 === 0 ? 100 : 220 }));
+  const at = id => pos.find(p => p.c.id === id);
+  const edgeInfo = DATA.edges.map(e => {
+    const n = sharedCount(e.from, e.to);
+    if (e.relation.length > 16) throw new Error("Edge relation too long: " + e.relation);
+    return { e, n, a: at(e.from), b: at(e.to) };
+  });
+  const lines = edgeInfo.map(({ a, b, n }) => svg("line", { x1: a.x, y1: a.y, x2: b.x, y2: b.y, class: n ? "dashed" : "" }));
+  const labels = edgeInfo.map(({ e, n, a, b }) => {
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    return svg("text", { class: "edge", x: mx, y: my - 2 },
+      svg("tspan", { x: mx, dy: 0 }, e.relation), n ? svg("tspan", { x: mx, dy: 14 }, "differs on " + n) : null);
+  });
+  const nodes = pos.map(({ c, x, y }) => svg("a", { href: "#cont-" + c.id },
+    svg("circle", { cx: x, cy: y, r: 22 }), svg("text", { x: x, y: y + 40 }, c.short)));
+  const map = svg("svg", { class: "map-svg", viewBox: "0 0 560 320", role: "group", "aria-labelledby": "map-title", width: 560, height: 320 },
+    svg("title", { id: "map-title" }, "Map of five continuities and how they relate"), lines, labels, nodes);
+
+  const listItems = edgeInfo.map(({ e, n }) => h("li", {},
+    contName(e.from) + " — " + e.relation + " → " + contName(e.to) + (n ? " · differs on " + n : ""), sourceNote(e.source)));
+  const asList = h("details", { class: "disc", id: "map-list", open: narrow },
+    h("summary", {}, "As a list"), h("ul", { class: "map-list" }, listItems));
+
+  const cards = DATA.continuities.map(c => {
+    const diffs = DATA.comparisons.filter(cm => cm.positions.length > 1 && cm.positions.some(p => p.continuityId === c.id));
+    const premise = resolve(c, "premise");
+    return h("article", { class: "card", id: "cont-" + c.id, tabindex: "-1" },
+      h("h3", { id: "h-cont-" + c.id }, contName(c.id)),
+      h("dl", { class: "facts" }, h("dt", {}, "Years"), h("dd", {}, eraOf(c).years), h("dt", {}, "Main media"), h("dd", {}, c.media)),
+      h("p", {}, premise.text), sourceNote(mergeSources(c.source, premise.source)),
+      detailsButton("cont-" + c.id),
+      detailsRegion("cont-" + c.id,
+        diffs.length ? h("p", {}, "Differs from the others on:") : h("p", { class: "unknown" }, "No differences recorded."),
+        diffs.length ? h("ul", {}, diffs.map(cm => h("li", {}, h("a", { href: "#cmp-" + cm.id }, cm.question)))) : null));
+  });
+
+  const cmpBlock = DATA.comparisons.length
+    ? [h("p", { class: "cmp-caption" }, "Continuities are listed in the same order everywhere on this page. The order is not a ranking."),
+       ...DATA.comparisons.map(cm => h("article", { class: "comparison", id: "cmp-" + cm.id, tabindex: "-1" },
+         h("h3", {}, cm.question),
+         h("p", { class: "cmp-lead" }, h("span", { "aria-hidden": "true" }, "≠ "), "Accounts differ. Each is correct within its own continuity."),
+         h("ul", { class: "cmp-cols" }, DATA.continuities.map(c => cm.positions.find(p => p.continuityId === c.id)).filter(Boolean).map(p => h("li", {},
+           h("p", { class: "cmp-who" }, h("a", { href: "#cont-" + p.continuityId }, "In " + contName(p.continuityId))),
+           p.accounts.flatMap(a => { const prose = resolve(a); return [
+             h("p", {}, a.label ? a.label + ": " : "", prose.text), prose.source.length ? sourceNote(prose.source) : h("p", { class: "unknown" }, "unknown")]; }))))))]
+    : [h("p", { class: "meta" }, "No differences recorded yet.")];
+
+  root.replaceChildren(asList,
+    h("div", { class: "map-tools" }, h("a", { href: "#continuity-cards" }, "Skip map")), map,
+    h("div", { id: "continuity-cards", class: "cards cont-cards", tabindex: "-1" }, cards), ...cmpBlock);
+}
+function initContinuities() {
+  matchMedia(NARROW_QUERY).addEventListener("change", e => {
+    const list = $("#map-list");
+    if (list && e.matches) list.open = true;
+  });
+}
+
+/* ---- 5. Quiz ---- */
+function renderQuestion() {
+  const q = DATA.quiz[state.quiz.i];
+  $("#quiz-q").replaceChildren(h("fieldset", { tabindex: "-1", id: "quiz-fs" },
+    h("legend", {}, h("span", { class: "qn" }, "Question " + (state.quiz.i + 1) + " of " + DATA.quiz.length), h("span", { class: "qt" }, q.question)),
+    q.options.map((o, i) => h("label", { class: "opt" }, h("input", { type: "radio", name: "q-" + q.id, value: String(i) }), h("span", {}, o), h("span", { class: "mark" })))));
+  $("#quiz-next").hidden = true;
+  $("#quiz-next").textContent = state.quiz.i === DATA.quiz.length - 1 ? "See summary" : "Next question";
+  $("#quiz-result").replaceChildren();
+}
+function clearMarks() {
+  document.querySelectorAll("#quiz-q .mark").forEach(m => { m.textContent = ""; });
+}
+function checkAnswer() {
+  const q = DATA.quiz[state.quiz.i], out = $("#quiz-result");
+  const chosen = $("#quiz-q input:checked");
+  if (!chosen) { out.replaceChildren("Choose an answer, then press Check."); return; }
+  const pick = +chosen.value, right = pick === q.answer, why = resolve(q, "explanation");
+  if (!(q.id in state.quiz.firstTry)) state.quiz.firstTry[q.id] = right;
+  clearMarks();
+  const marks = document.querySelectorAll("#quiz-q .mark");
+  marks[q.answer].textContent = " (correct answer)";
+  if (!right) marks[pick].textContent = " (your answer)";
+  else marks[pick].textContent = " (your answer, correct)";
+  out.replaceChildren(
+    right ? h("span", { class: "ok" }, "✓ Correct") : h("span", { class: "bad" }, "✗ Not quite"), ". ", why.text, " ", sourceNote(why.source));
+  $("#quiz-next").hidden = false;
+}
+/* Section titles come from the page's own <h2>s, not from a copy here. */
+function sectionTitle(id) {
+  const heading = document.getElementById(id) && document.getElementById(id).querySelector("h2");
+  if (!heading) throw new Error("Unknown section id: " + id);
+  return heading.textContent;
+}
+function showSummary() {
+  const sum = $("#quiz-summary");
+  const got = DATA.quiz.filter(q => state.quiz.firstTry[q.id]).length;
+  sum.replaceChildren(h("h3", {}, "What you covered"),
+    h("ol", { class: "summary-list" }, DATA.quiz.map(q => { const why = resolve(q, "explanation"); return h("li", {},
+      h("p", {}, h("strong", {}, q.question)), h("p", {}, "Answer: " + q.options[q.answer]), h("p", {}, why.text), sourceNote(why.source),
+      h("p", {}, "Read more: ", h("a", { href: "#" + q.sectionId }, sectionTitle(q.sectionId)), ".")); })),
+    h("p", {}, "You got " + got + " of " + DATA.quiz.length + " on the first try."),
+    h("button", { type: "button", class: "btn", id: "quiz-restart" }, "Start again"));
+  $("#quiz-q").hidden = true; $("#quiz-actions").hidden = true; $("#quiz-result").replaceChildren();
+  sum.hidden = false;
+  $("#quiz-form").focus();
+}
+function initQuiz() {
+  const form = $("#quiz-form");
+  form.addEventListener("submit", e => { e.preventDefault(); safe("quiz", checkAnswer); });
+  form.addEventListener("change", e => {
+    if (e.target.type !== "radio") return;
+    clearMarks();
+    $("#quiz-result").replaceChildren();
+    $("#quiz-next").hidden = true;
+  });
+  $("#quiz-next").addEventListener("click", () => safe("quiz", () => {
+    if (state.quiz.i === DATA.quiz.length - 1) { showSummary(); return; }
+    state.quiz.i += 1;
+    renderQuestion();
+    $("#quiz-fs").focus();
+  }));
+  $("#quiz-summary").addEventListener("click", e => {
+    if (!e.target.closest("#quiz-restart")) return;
+    safe("quiz", () => {
+      state.quiz = { i: 0, firstTry: {} };
+      $("#quiz-summary").hidden = true; $("#quiz-q").hidden = false; $("#quiz-actions").hidden = false;
+      renderQuestion();
+      $("#quiz-fs").focus();
+    });
+  });
+}
+
+/* ---- Theme toggle and footer ---- */
+function initTheme() {
+  const btn = $("#theme-toggle");
+  const query = matchMedia("(prefers-color-scheme: dark)");
+  let dark = query.matches, pressed = false;
+  const sync = () => { btn.setAttribute("aria-pressed", dark ? "true" : "false"); $("#theme-tick").textContent = dark ? "✓ " : ""; };
+  sync();
+  query.addEventListener("change", e => { if (!pressed) { dark = e.matches; sync(); } });  /* follow the OS until the first press */
+  btn.addEventListener("click", () => {
+    pressed = true;
+    dark = !dark;
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    sync();
+  });
+}
+
+/* ---- Start ---- */
+document.documentElement.classList.add("js");
+$("#footer-note").textContent = DATA.meta.note + " Assembled " + DATA.meta.assembled + ".";
+/* One delegated Details handler for every card, character or continuity. */
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-details]");
+  if (b) safe(b.closest("section").id, () => toggleDetails(b));
+});
+initTheme();
+initRail(); initLore(); initCharacters(); initContinuities(); initQuiz();
+safe("timeline", () => renderTimeline(false));
+safe("lore", renderLore);
+safe("characters", () => { renderFilters(); renderCards(false); });
+safe("continuities", renderContinuities);
+safe("quiz", renderQuestion);
+</script>
+</body>
+</html>
